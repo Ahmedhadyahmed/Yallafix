@@ -46,6 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, '/signup');
   }
 
+  void _navigateToForgotPassword() {
+    Navigator.pushNamed(context, '/forgot-password');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: _navigateToForgotPassword, // Updated: Now navigates to forgot password screen
                         child: const Text(
                           'Forgot your password?',
                           style: TextStyle(

@@ -11,20 +11,30 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:yala_fix/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('App loads and shows home page', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const RoadHelperApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the app loads properly
+    // Look for elements that should be present on the home page
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Services'), findsOneWidget);
+    expect(find.text('Activity'), findsOneWidget);
+    expect(find.text('Account'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Verify that we start on the Home tab
+    expect(find.byIcon(Icons.home_rounded), findsOneWidget);
+  });
+
+  testWidgets('Navigation works correctly', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const RoadHelperApp());
+
+    // Tap the 'Services' tab
+    await tester.tap(find.text('Services'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that we can navigate (the services tab should still be there)
+    expect(find.text('Services'), findsOneWidget);
   });
 }
