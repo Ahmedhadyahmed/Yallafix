@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'car_info_page.dart';
+import 'setting.dart'; // Add this import
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -56,7 +57,16 @@ class AccountPage extends StatelessWidget {
                 );
               },
             ),
-            _buildMenuButton(icon: Icons.settings, label: "Settings", onTap: () {}),
+            _buildMenuButton(
+              icon: Icons.settings,
+              label: "Settings",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingPage()),
+                );
+              },
+            ),
             _buildMenuButton(icon: Icons.message, label: "messages", onTap: () {}),
             _buildMenuButton(icon: Icons.info, label: "legal", onTap: () {}),
 
