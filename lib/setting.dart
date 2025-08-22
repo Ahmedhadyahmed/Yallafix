@@ -3,6 +3,7 @@ import 'package:yala_fix/personal_info.dart';
 import 'Login.dart';
 // Import the screens you'll navigate to
 import 'Privacy_&_Security.dart';
+import 'help_center_screen.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -134,7 +135,15 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.help_outline,
                   title: 'Help Center',
                   subtitle: 'Get help and support',
-                  onTap: () {},
+                  onTap: () {
+                    // Navigate to Help Center Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HelpCenterScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const Divider(height: 1),
                 _buildSettingItem(
