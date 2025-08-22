@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:yala_fix/personal_info.dart';
 import 'Login.dart';
+// Import the screens you'll navigate to
+import 'Privacy_&_Security.dart';
+
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -48,21 +52,30 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.person_outline,
                   title: 'Profile Information',
                   subtitle: 'Update your personal details',
-                  onTap: () {},
+                  onTap: () {
+                    // Navigate to Profile Information Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileInfoScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const Divider(height: 1),
                 _buildSettingItem(
                   icon: Icons.security,
                   title: 'Privacy & Security',
                   subtitle: 'Manage your privacy settings',
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingItem(
-                  icon: Icons.payment,
-                  title: 'Payment Methods',
-                  subtitle: 'Manage cards and payment options',
-                  onTap: () {},
+                  onTap: () {
+                    // Navigate to Privacy & Security Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacySecurityScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -128,13 +141,6 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.feedback_outlined,
                   title: 'Send Feedback',
                   subtitle: 'Share your thoughts with us',
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingItem(
-                  icon: Icons.star_outline,
-                  title: 'Rate App',
-                  subtitle: 'Rate Yalla Fix on app store',
                   onTap: () {},
                 ),
               ],

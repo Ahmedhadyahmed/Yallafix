@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:yala_fix/payment_methods.dart';
 import 'car_info_page.dart';
 import 'setting.dart'; // Add this import
+
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -58,6 +60,17 @@ class AccountPage extends StatelessWidget {
               },
             ),
             _buildMenuButton(
+              icon: Icons.payment,
+              label: "Payment Methods",
+              onTap: () {
+                // Navigate to payment methods page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PaymentMethodScreen()),
+                );
+              },
+            ),
+            _buildMenuButton(
               icon: Icons.settings,
               label: "Settings",
               onTap: () {
@@ -68,7 +81,7 @@ class AccountPage extends StatelessWidget {
               },
             ),
             _buildMenuButton(icon: Icons.message, label: "messages", onTap: () {}),
-            _buildMenuButton(icon: Icons.info, label: "legal", onTap: () {}),
+            _buildMenuButton(icon: Icons.description, label: "Terms & Services", onTap: () {}),
 
             const Spacer(),
           ],
