@@ -4,6 +4,7 @@ import 'Login.dart';
 // Import the screens you'll navigate to
 import 'Privacy_&_Security.dart';
 import 'help_center_screen.dart';
+import 'privacy_policy.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -174,12 +175,16 @@ class _SettingPageState extends State<SettingPage> {
                   subtitle: 'Read our terms and conditions',
                   onTap: () {},
                 ),
-                const Divider(height: 1),
                 _buildSettingItem(
                   icon: Icons.privacy_tip_outlined,
                   title: 'Privacy Policy',
                   subtitle: 'Learn about our privacy practices',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
+                    );
+                  },
                 ),
               ],
             ),
