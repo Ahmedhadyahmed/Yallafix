@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const FeedbackApp());
-}
 
 const kBrand = Color(0xFFD48921);
 

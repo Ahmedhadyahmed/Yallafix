@@ -3,6 +3,8 @@ import 'package:yala_fix/personal_info.dart';
 import 'Login.dart';
 // Import the screens you'll navigate to
 import 'Privacy_&_Security.dart';
+import 'Terms_&_Services.dart';
+import 'feed_back.dart';
 import 'help_center_screen.dart';
 import 'privacy_policy.dart';
 
@@ -151,7 +153,14 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.feedback_outlined,
                   title: 'Send Feedback',
                   subtitle: 'Share your thoughts with us',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FeedbackApp(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -173,7 +182,14 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.description_outlined,
                   title: 'Terms of Service',
                   subtitle: 'Read our terms and conditions',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TermsAndServicesPage(),
+                    ),
+                  );
+                    },
                 ),
                 _buildSettingItem(
                   icon: Icons.privacy_tip_outlined,
