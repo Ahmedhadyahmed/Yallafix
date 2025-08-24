@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:yala_fix/payment_methods.dart';
 import 'car_info_page.dart';
-import 'setting.dart'; // Add this import
+import 'setting.dart';
+import 'msg_screens.dart';
+import 'T_S.dart';
 
 
 class AccountPage extends StatelessWidget {
@@ -80,8 +82,28 @@ class AccountPage extends StatelessWidget {
                 );
               },
             ),
-            _buildMenuButton(icon: Icons.message, label: "messages", onTap: () {}),
-            _buildMenuButton(icon: Icons.description, label: "Terms & Services", onTap: () {}),
+            _buildMenuButton(
+                icon: Icons.message,
+                label: "messages",
+                onTap: () {
+                  // Navigate to messages screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MessagesScreen()),
+                  );
+                }
+            ),
+            _buildMenuButton(
+                icon: Icons.description,
+                label: "Terms & Services",
+                onTap: () {
+                  // Navigate to Terms and Services screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TermsAndServicesScreen()),
+                  );
+                }
+            ),
 
             const Spacer(),
           ],
@@ -90,7 +112,6 @@ class AccountPage extends StatelessWidget {
     );
   }
 
-  // NOTE: now accepts onTap and uses it
   Widget _buildMenuButton({
     required IconData icon,
     required String label,
