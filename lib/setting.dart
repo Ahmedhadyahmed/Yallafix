@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yala_fix/personal_info.dart';
+import 'package:your_app_name/personal_info.dart';
 import 'Login.dart';
 // Import the screens you'll navigate to
 import 'Privacy_&_Security.dart';
@@ -417,7 +417,7 @@ class _SettingPageState extends State<SettingPage> {
               // Navigate to login screen and clear all previous routes
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                MaterialPageRoute(builder: (context) => const FirebaseLoginScreen()),
                     (Route<dynamic> route) => false,
               );
             },

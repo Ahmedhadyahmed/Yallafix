@@ -156,13 +156,6 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
             _showPasswordDialog();
           },
         ),
-        const Divider(height: 1),
-        _buildActionItem(
-          icon: Icons.devices_rounded,
-          title: 'Active Sessions',
-          subtitle: 'Manage your logged-in devices',
-          onTap: () {},
-        ),
       ],
     );
   }
@@ -199,13 +192,6 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           icon: Icons.visibility_outlined,
           title: 'Data Usage',
           subtitle: 'View what data we collect',
-          onTap: () {},
-        ),
-        const Divider(height: 1),
-        _buildActionItem(
-          icon: Icons.block_rounded,
-          title: 'Blocked Users',
-          subtitle: 'Manage blocked accounts',
           onTap: () {},
         ),
       ],

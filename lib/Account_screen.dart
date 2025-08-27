@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yala_fix/payment_methods.dart';
+import 'package:your_app_name/payment_methods.dart';
 import 'car_info_page.dart';
 import 'setting.dart';
 import 'msg_screens.dart';

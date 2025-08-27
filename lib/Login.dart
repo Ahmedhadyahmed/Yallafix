@@ -1,53 +1,110 @@
 import 'package:flutter/material.dart';
+import 'Sign_up.dart';
+import 'firebase_auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class FirebaseLoginScreen extends StatefulWidget {
+  const FirebaseLoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<FirebaseLoginScreen> createState() => _FirebaseLoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
-  // Constants for login
-  static const String validEmail = "admin";
-  static const String validPassword = "admin";
+  bool _isLoading = false;
+  bool _obscurePassword = true;
 
-  void _handleLogin() {
-    if (_emailController.text == validEmail && _passwordController.text == validPassword) {
-      // Navigate to home screen
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      // Show error dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Login Failed'),
-            content: const Text('Invalid email or password. Please try again.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+      _showErrorDialog('Please fill in all fields');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final user = await _authService.signInWithEmailAndPassword(
+        emailOrUsername: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
+
+      if (user != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome back, ${user.name}!'),
+            backgroundColor: const Color(0xFFFF7A00),
+          ),
+        );
+
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorDialog(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  void _navigateToSignUp() {
-    Navigator.pushNamed(context, '/signup');
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Failed'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void _navigateToForgotPassword() {
-    Navigator.pushNamed(context, '/forgot-password');
+  Future<void> _handleForgotPassword() async {
+    if (_emailController.text.trim().isEmpty) {
+      _showErrorDialog('Please enter your email address first');
+      return;
+    }
+
+    try {
+      await _authService.sendPasswordResetEmail(_emailController.text.trim());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password reset email sent! Check your inbox.'),
+            backgroundColor: Color(0xFFFF7A00),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorDialog('Failed to send reset email: $e');
+      }
+    }
   }
 
   @override
@@ -57,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          // Main content with SafeArea
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -95,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 60),
 
-                    // Email field
+                    // Email/Username field
                     Container(
                       decoration: BoxDecoration(
                         color: const Color(0xFFF1F4FF),
@@ -122,6 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Text field
                           TextField(
                             controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
                             decoration: const InputDecoration(
                               hintText: 'Email',
                               hintStyle: TextStyle(
@@ -150,18 +207,29 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: TextField(
                         controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
                           hintText: 'Password',
-                          hintStyle: TextStyle(
+                          hintStyle: const TextStyle(
                             color: Color(0xFF9CA3AF),
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20,
                             vertical: 18,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              color: const Color(0xFF9CA3AF),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                         ),
                       ),
@@ -173,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: _navigateToForgotPassword, // Updated: Now navigates to forgot password screen
+                        onPressed: _handleForgotPassword,
                         child: const Text(
                           'Forgot your password?',
                           style: TextStyle(
@@ -208,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: _handleLogin,
+                        onPressed: _isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
@@ -216,7 +284,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text(
+                        child: _isLoading
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                            : const Text(
                           'Sign in',
                           style: TextStyle(
                             color: Colors.white,
@@ -231,7 +308,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Create new account
                     TextButton(
-                      onPressed: _navigateToSignUp,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const FirebaseSignUpScreen()),
+                        );
+                      },
                       child: const Text(
                         'Create new account',
                         style: TextStyle(
@@ -311,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 170), // Increased extra space to accommodate larger bottom waves
+                    const SizedBox(height: 170),
 
                     // Extra space for keyboard
                     SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0 ? 100 : 0),
@@ -321,7 +403,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Bottom decorative waves (at actual bottom of physical screen)
+          // Bottom decorative waves
           Positioned(
             bottom: 0,
             left: 0,
