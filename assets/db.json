@@ -1,0 +1,178 @@
+{
+  "categories": [
+    "All",
+    "Emergency",
+    "Maintenance",
+    "Parts",
+    "Inspection"
+  ],
+  "services": [
+    {
+      "id": "tow",
+      "title": "Tow Service",
+      "icon": "local_shipping_rounded",
+      "color": "#2196F3",
+      "eta": "15-25 min",
+      "rating": 4.7,
+      "price": "From 250 EGP",
+      "isNew": false,
+      "description": "Professional towing service for all vehicle types",
+      "category": "Emergency",
+      "details": "Our professional tow service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "24/7 availability",
+        "Professional drivers",
+        "All vehicle types",
+        "GPS tracking",
+        "Insurance covered"
+      ]
+    },
+    {
+      "id": "mechanic",
+      "title": "Mobile Mechanic",
+      "icon": "build_rounded",
+      "color": "#4CAF50",
+      "eta": "20-35 min",
+      "rating": 4.8,
+      "price": "From 375 EGP",
+      "isNew": true,
+      "description": "Expert mechanics come to your location",
+      "category": "Maintenance",
+      "details": "Our professional mobile mechanic service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "Certified mechanics",
+        "On-site repairs",
+        "Diagnostic tools",
+        "Quality parts",
+        "Warranty included"
+      ]
+    },
+    {
+      "id": "parts",
+      "title": "Auto Parts",
+      "icon": "settings_rounded",
+      "color": "#FF9800",
+      "eta": "25-45 min",
+      "rating": 4.6,
+      "price": "From 150 EGP",
+      "isNew": false,
+      "description": "Quality auto parts delivered fast",
+      "category": "Parts",
+      "details": "Our professional auto parts service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "OEM quality parts",
+        "Fast delivery",
+        "Wide inventory",
+        "Installation service",
+        "Return policy"
+      ]
+    },
+    {
+      "id": "battery",
+      "title": "Battery Service",
+      "icon": "battery_charging_full_rounded",
+      "color": "#E91E63",
+      "eta": "10-20 min",
+      "rating": 4.9,
+      "price": "From 125 EGP",
+      "isNew": false,
+      "description": "Jump start and battery replacement",
+      "category": "Emergency",
+      "details": "Our professional battery service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "Jump start service",
+        "Battery replacement",
+        "Free testing",
+        "Quick response",
+        "All battery types"
+      ]
+    },
+    {
+      "id": "tire",
+      "title": "Tire Service",
+      "icon": "tire_repair_rounded",
+      "color": "#9C27B0",
+      "eta": "15-30 min",
+      "rating": 4.5,
+      "price": "From 200 EGP",
+      "isNew": false,
+      "description": "Tire repair and replacement service",
+      "category": "Maintenance",
+      "details": "Our professional tire service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "Tire repair",
+        "Tire replacement",
+        "Wheel balancing",
+        "Pressure check",
+        "Emergency service"
+      ]
+    },
+    {
+      "id": "fuel",
+      "title": "Fuel Delivery",
+      "icon": "local_gas_station_rounded",
+      "color": "#607D8B",
+      "eta": "15-25 min",
+      "rating": 4.8,
+      "price": "From 175 EGP",
+      "isNew": true,
+      "description": "Emergency fuel delivery service",
+      "category": "Emergency",
+      "details": "Our professional fuel delivery service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "Emergency delivery",
+        "Quality fuel",
+        "Quick response",
+        "Safe handling",
+        "24/7 availability"
+      ]
+    },
+    {
+      "id": "inspection",
+      "title": "Vehicle Inspection",
+      "icon": "search_rounded",
+      "color": "#795548",
+      "eta": "30-45 min",
+      "rating": 4.7,
+      "price": "From 400 EGP",
+      "isNew": false,
+      "description": "Comprehensive vehicle inspection",
+      "category": "Inspection",
+      "details": "Our professional vehicle inspection service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "Full inspection",
+        "Detailed report",
+        "Safety check",
+        "Performance test",
+        "Digital report"
+      ]
+    },
+    {
+      "id": "lockout",
+      "title": "Lockout Service",
+      "icon": "key_rounded",
+      "color": "#FF5722",
+      "eta": "15-25 min",
+      "rating": 4.6,
+      "price": "From 300 EGP",
+      "isNew": false,
+      "description": "Professional car lockout assistance",
+      "category": "Emergency",
+      "details": "Our professional lockout service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.",
+      "features": [
+        "No damage entry",
+        "All vehicle types",
+        "Quick response",
+        "Experienced staff",
+        "Emergency service"
+      ]
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2024-01-15T10:00:00Z",
+    "currency": "EGP",
+    "timezone": "Africa/Cairo",
+    "supportedLanguages": ["en", "ar"]
+  }
+}

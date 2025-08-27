@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({super.key});
@@ -14,14 +12,112 @@ class _ServicesPageState extends State<ServicesPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Updated API Configuration with your mock API endpoints
-  static const String baseUrl = 'https://mock-api.net/api/task-two';
+  final List<String> categories = [
+    'All',
+    'Emergency',
+    'Maintenance',
+    'Parts',
+    'Inspection'
+  ];
 
-  // State management for API data
-  List<String> categories = ['All']; // Start with 'All', will be populated from API
-  List<ServiceItem> allServices = [];
-  bool isLoading = true;
-  String? errorMessage;
+  final List<ServiceItem> allServices = [
+    ServiceItem(
+      id: 'tow',
+      title: 'Tow Service',
+      icon: Icons.local_shipping_rounded,
+      color: const Color(0xFF2196F3),
+      eta: '15-25 min',
+      rating: 4.7,
+      price: 'From 250 EGP',
+      isNew: false,
+      description: 'Professional towing service for all vehicle types',
+      category: 'Emergency',
+    ),
+    ServiceItem(
+      id: 'mechanic',
+      title: 'Mobile Mechanic',
+      icon: Icons.build_rounded,
+      color: const Color(0xFF4CAF50),
+      eta: '20-35 min',
+      rating: 4.8,
+      price: 'From 375 EGP',
+      isNew: true,
+      description: 'Expert mechanics come to your location',
+      category: 'Maintenance',
+    ),
+    ServiceItem(
+      id: 'parts',
+      title: 'Auto Parts',
+      icon: Icons.settings_rounded,
+      color: const Color(0xFFFF9800),
+      eta: '25-45 min',
+      rating: 4.6,
+      price: 'From 150 EGP',
+      isNew: false,
+      description: 'Quality auto parts delivered fast',
+      category: 'Parts',
+    ),
+    ServiceItem(
+      id: 'battery',
+      title: 'Battery Service',
+      icon: Icons.battery_charging_full_rounded,
+      color: const Color(0xFFE91E63),
+      eta: '10-20 min',
+      rating: 4.9,
+      price: 'From 125 EGP',
+      isNew: false,
+      description: 'Jump start and battery replacement',
+      category: 'Emergency',
+    ),
+    ServiceItem(
+      id: 'tire',
+      title: 'Tire Service',
+      icon: Icons.tire_repair_rounded,
+      color: const Color(0xFF9C27B0),
+      eta: '15-30 min',
+      rating: 4.5,
+      price: 'From 200 EGP',
+      isNew: false,
+      description: 'Tire repair and replacement service',
+      category: 'Maintenance',
+    ),
+    ServiceItem(
+      id: 'fuel',
+      title: 'Fuel Delivery',
+      icon: Icons.local_gas_station_rounded,
+      color: const Color(0xFF607D8B),
+      eta: '15-25 min',
+      rating: 4.8,
+      price: 'From 175 EGP',
+      isNew: true,
+      description: 'Emergency fuel delivery service',
+      category: 'Emergency',
+    ),
+    ServiceItem(
+      id: 'inspection',
+      title: 'Vehicle Inspection',
+      icon: Icons.search_rounded,
+      color: const Color(0xFF795548),
+      eta: '30-45 min',
+      rating: 4.7,
+      price: 'From 400 EGP',
+      isNew: false,
+      description: 'Comprehensive vehicle inspection',
+      category: 'Inspection',
+    ),
+    ServiceItem(
+      id: 'lockout',
+      title: 'Lockout Service',
+      icon: Icons.key_rounded,
+      color: const Color(0xFFFF5722),
+      eta: '15-25 min',
+      rating: 4.6,
+      price: 'From 300 EGP',
+      isNew: false,
+      description: 'Professional car lockout assistance',
+      category: 'Emergency',
+    ),
+  ];
 
   List<ServiceItem> get filteredServices {
     List<ServiceItem> filtered = allServices;
@@ -50,80 +146,6 @@ class _ServicesPageState extends State<ServicesPage> {
         _searchQuery = _searchController.text;
       });
     });
-    _loadData();
-  }
-
-  // Load data from API
-  Future<void> _loadData() async {
-    try {
-      setState(() {
-        isLoading = true;
-        errorMessage = null;
-      });
-
-      // Load both services and categories
-      final results = await Future.wait([
-        _fetchServices(),
-        _fetchCategories(),
-      ]);
-
-      setState(() {
-        allServices = results[0] as List<ServiceItem>;
-        final apiCategories = results[1] as List<String>;
-        // Remove 'All' from API categories if it exists and add it manually at the beginning
-        final filteredCategories = apiCategories.where((cat) => cat != 'All').toList();
-        categories = ['All', ...filteredCategories];
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Failed to load data: ${e.toString()}';
-        isLoading = false;
-      });
-    }
-  }
-
-  // Fetch services from API
-  Future<List<ServiceItem>> _fetchServices() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/services'),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((json) => ServiceItem.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load services: HTTP ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
-
-  // Fetch categories from API
-  Future<List<String>> _fetchCategories() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/categories'),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((item) => item['name'] as String).toList();
-      } else {
-        throw Exception('Failed to load categories: HTTP ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
-
-  // Pull to refresh functionality
-  Future<void> _handleRefresh() async {
-    await _loadData();
   }
 
   @override
@@ -148,93 +170,8 @@ class _ServicesPageState extends State<ServicesPage> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Color(0xFFFF8C00)),
-            onPressed: _handleRefresh,
-          ),
-        ],
       ),
-      body: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF8C00)),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Loading services...',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 60,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Oops! Something went wrong',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                errorMessage!,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[500],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _handleRefresh,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF8C00),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Retry',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _handleRefresh,
-      color: const Color(0xFFFF8C00),
-      child: Column(
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
@@ -361,7 +298,7 @@ class _ServicesPageState extends State<ServicesPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Try a different search term or category',
+            'Try a different search term',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[500],
@@ -641,12 +578,6 @@ class _ServicesPageState extends State<ServicesPage> {
                         onPressed: () {
                           Navigator.pop(context);
                           // Handle service booking
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Booking ${service.title}...'),
-                              backgroundColor: const Color(0xFFFF8C00),
-                            ),
-                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF8C00),
@@ -733,85 +664,4 @@ class ServiceItem {
     required this.description,
     required this.category,
   });
-
-  // Factory constructor to create ServiceItem from JSON
-  factory ServiceItem.fromJson(Map<String, dynamic> json) {
-    return ServiceItem(
-      id: json['id']?.toString() ?? '',
-      title: json['title'] ?? '',
-      icon: _getIconFromString(json['icon']),
-      color: _getColorFromString(json['color']),
-      eta: json['eta'] ?? '',
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      price: json['price'] ?? '',
-      isNew: json['isNew'] ?? false,
-      description: json['description'] ?? '',
-      category: json['category'] ?? '',
-    );
-  }
-
-  // Helper method to convert icon string to IconData
-  static IconData _getIconFromString(String? iconString) {
-    switch (iconString) {
-      case 'local_shipping_rounded':
-        return Icons.local_shipping_rounded;
-      case 'build_rounded':
-        return Icons.build_rounded;
-      case 'settings_rounded':
-        return Icons.settings_rounded;
-      case 'battery_charging_full_rounded':
-        return Icons.battery_charging_full_rounded;
-      case 'tire_repair_rounded':
-        return Icons.tire_repair_rounded;
-      case 'local_gas_station_rounded':
-        return Icons.local_gas_station_rounded;
-      case 'search_rounded':
-        return Icons.search_rounded;
-      case 'key_rounded':
-        return Icons.key_rounded;
-      default:
-        return Icons.help_outline_rounded;
-    }
-  }
-
-  // Helper method to convert color string to Color
-  static Color _getColorFromString(String? colorString) {
-    if (colorString == null || !colorString.startsWith('#')) {
-      return Colors.grey;
-    }
-    try {
-      return Color(int.parse(colorString.substring(1), radix: 16) + 0xFF000000);
-    } catch (e) {
-      return Colors.grey;
-    }
-  }
-
-  // Convert ServiceItem to JSON (for potential future use)
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'icon': _getStringFromIcon(icon),
-      'color': '#${color.value.toRadixString(16).substring(2)}',
-      'eta': eta,
-      'rating': rating,
-      'price': price,
-      'isNew': isNew,
-      'description': description,
-      'category': category,
-    };
-  }
-
-  // Helper method to convert IconData back to string
-  static String _getStringFromIcon(IconData icon) {
-    if (icon == Icons.local_shipping_rounded) return 'local_shipping_rounded';
-    if (icon == Icons.build_rounded) return 'build_rounded';
-    if (icon == Icons.settings_rounded) return 'settings_rounded';
-    if (icon == Icons.battery_charging_full_rounded) return 'battery_charging_full_rounded';
-    if (icon == Icons.tire_repair_rounded) return 'tire_repair_rounded';
-    if (icon == Icons.local_gas_station_rounded) return 'local_gas_station_rounded';
-    if (icon == Icons.search_rounded) return 'search_rounded';
-    if (icon == Icons.key_rounded) return 'key_rounded';
-    return 'help_outline_rounded';
-  }
 }
