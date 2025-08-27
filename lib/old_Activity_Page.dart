@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 
 class ActivityPage extends StatefulWidget {
@@ -221,3 +222,5 @@ class ActivityItem extends StatelessWidget {
     );
   }
 }
+
+ */
