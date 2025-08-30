@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:your_app_name/service.dart';
 import 'Account_screen.dart';
+import 'Activity_Page.dart';
 import 'old_Activity_Page.dart';
 import 'Login.dart';
 import 'forget_password.dart';

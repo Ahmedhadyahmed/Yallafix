@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+// Import your map screen
+import 'Map_Screen.dart'; // Adjust the import path as needed
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({super.key});
@@ -119,6 +121,212 @@ class _ServicesPageState extends State<ServicesPage> {
     } catch (e) {
       throw Exception('Network error: $e');
     }
+  }
+
+  // Navigate to map screen for service booking
+  void _navigateToMapForService(ServiceItem service) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AlexandriaMapScreen(
+          title: '${service.title} - Alexandria',
+          showCurrentLocation: true,
+          serviceItem: service, // Pass the service item to the map
+        ),
+      ),
+    );
+
+    // Handle the returned data from map screen
+    if (result != null && result['location'] != null) {
+      final selectedLocation = result['location'];
+      final selectedAddress = result['address'];
+      final serviceItem = result['service'];
+
+      // Show booking confirmation dialog with location details
+      _showBookingConfirmationDialog(service, selectedLocation, selectedAddress);
+    }
+  }
+
+  // Show booking confirmation with location details
+  void _showBookingConfirmationDialog(ServiceItem service, dynamic location, String? address) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirm Service Booking'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Service info
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: service.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    service.icon,
+                    color: service.color,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        service.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'Price: ${service.price}',
+                        style: TextStyle(
+                          color: Color(0xFFFF8C00),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text('ETA: ${service.eta}'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Divider(),
+            SizedBox(height: 8),
+
+            // Location info
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.place, color: Colors.red, size: 20),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Service Location:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        address ?? 'Selected location on map',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _processBooking(service, address);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF8C00),
+            ),
+            child: Text(
+              'Confirm Booking',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Handle service booking confirmation
+  void _confirmServiceBooking(ServiceItem service) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirm Booking'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              service.icon,
+              size: 48,
+              color: service.color,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Book ${service.title}?',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text('Price: ${service.price}'),
+            Text('ETA: ${service.eta}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _processBooking(service, null);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF8C00),
+            ),
+            child: Text(
+              'Confirm',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Process the final booking
+  void _processBooking(ServiceItem service, String? location) {
+    String message = '${service.title} booked successfully! We\'ll be there in ${service.eta}';
+    if (location != null) {
+      message += '\nLocation: ${location.length > 50 ? location.substring(0, 50) + '...' : location}';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
   }
 
   // Pull to refresh functionality
@@ -640,13 +848,8 @@ class _ServicesPageState extends State<ServicesPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          // Handle service booking
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Booking ${service.title}...'),
-                              backgroundColor: const Color(0xFFFF8C00),
-                            ),
-                          );
+                          // Navigate to map instead of just showing snackbar
+                          _navigateToMapForService(service);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF8C00),
@@ -656,7 +859,7 @@ class _ServicesPageState extends State<ServicesPage> {
                           ),
                         ),
                         child: const Text(
-                          'Book Service',
+                          'Book Service - Choose Location',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,

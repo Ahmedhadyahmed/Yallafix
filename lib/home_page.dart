@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+// Import your map screen
+import 'Map_Screen.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -128,6 +131,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  // Method to navigate to map
+  void _navigateToMap() {
+    MapNavigation.navigateToMap(
+      context,
+      title: 'Select Service Location',
+      showCurrentLocation: true,
+      initialZoom: 13.0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,58 +183,69 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildSearchSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.search_rounded,
-              color: Colors.black54,
-              size: 24,
-            ),
-            const SizedBox(width: 16),
-            const Expanded(
-              child: Text(
-                'Where do you need help?',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
+      child: GestureDetector(
+        onTap: _navigateToMap, // Navigate to map when tapped
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(50),
+            // Add subtle shadow to indicate it's clickable
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.search_rounded,
+                color: Colors.black54,
+                size: 24,
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Text(
+                  'Where do you need help?',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFFF8C00).withOpacity(0.3)),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.schedule_rounded,
-                    size: 16,
-                    color: Color(0xFFFF8C00),
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    'Now',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFFF8C00).withOpacity(0.3)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 16,
                       color: Color(0xFFFF8C00),
                     ),
-                  ),
-                ],
+                    SizedBox(width: 4),
+                    Text(
+                      'Now',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFFF8C00),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -235,7 +259,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: _navigateToMap, // Also navigate to map when recent location is tapped
               borderRadius: BorderRadius.circular(12),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
@@ -353,6 +377,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               setState(() {
                 selectedService = service.id;
               });
+              // Navigate to map with service-specific title
+              MapNavigation.navigateToMap(
+                context,
+                title: '${service.title} Service Location',
+                showCurrentLocation: true,
+                initialZoom: 13.0,
+              );
             },
             borderRadius: BorderRadius.circular(16),
             child: Container(
@@ -490,30 +521,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  promo.subtitle,
-                                  style: TextStyle(
-                                    color: promo.colors[0],
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                          GestureDetector(
+                            onTap: _navigateToMap, // Navigate to map from promo button
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    promo.subtitle,
+                                    style: TextStyle(
+                                      color: promo.colors[0],
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.arrow_forward_rounded,
-                                  color: promo.colors[0],
-                                  size: 16,
-                                ),
-                              ],
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.arrow_forward_rounded,
+                                    color: promo.colors[0],
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

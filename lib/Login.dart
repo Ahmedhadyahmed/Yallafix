@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'Sign_up.dart';
-import 'firebase_auth_service.dart';
 
 class FirebaseLoginScreen extends StatefulWidget {
   const FirebaseLoginScreen({Key? key}) : super(key: key);
@@ -13,7 +13,6 @@ class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FirebaseAuthService _authService = FirebaseAuthService();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -36,24 +35,55 @@ class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
     });
 
     try {
-      final user = await _authService.signInWithEmailAndPassword(
-        emailOrUsername: _emailController.text.trim(),
+      // Direct Firebase Auth login - no custom service
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      if (user != null && mounted) {
+      if (userCredential.user != null && mounted) {
+        String userName = userCredential.user?.displayName ?? 'User';
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Welcome back, ${user.name}!'),
+            content: Text('Welcome back, $userName!'),
             backgroundColor: const Color(0xFFFF7A00),
+            duration: const Duration(seconds: 2),
           ),
         );
 
+        // Navigate to home screen
         Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        String errorMessage;
+
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No account found with this email. Please sign up first.';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Incorrect password. Please try again.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Please enter a valid email address.';
+            break;
+          case 'user-disabled':
+            errorMessage = 'This account has been disabled.';
+            break;
+          case 'too-many-requests':
+            errorMessage = 'Too many failed attempts. Please try again later.';
+            break;
+          default:
+            errorMessage = 'Login failed: ${e.message}';
+        }
+
+        _showErrorDialog(errorMessage);
       }
     } catch (e) {
       if (mounted) {
-        _showErrorDialog(e.toString());
+        _showErrorDialog('An unexpected error occurred: ${e.toString()}');
       }
     } finally {
       if (mounted) {
@@ -91,14 +121,33 @@ class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
     }
 
     try {
-      await _authService.sendPasswordResetEmail(_emailController.text.trim());
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text.trim(),
+      );
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Password reset email sent! Check your inbox.'),
             backgroundColor: Color(0xFFFF7A00),
+            duration: Duration(seconds: 3),
           ),
         );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        String errorMessage;
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No account found with this email address.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Please enter a valid email address.';
+            break;
+          default:
+            errorMessage = 'Failed to send reset email: ${e.message}';
+        }
+        _showErrorDialog(errorMessage);
       }
     } catch (e) {
       if (mounted) {
@@ -306,20 +355,42 @@ class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
 
                     const SizedBox(height: 30),
 
-                    // Create new account
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const FirebaseSignUpScreen()),
-                        );
-                      },
-                      child: const Text(
-                        'Create new account',
-                        style: TextStyle(
-                          color: Color(0xFF374151),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    // Create new account - BIGGER and MORE VISIBLE
+                    Container(
+                      width: double.infinity,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const FirebaseSignUpScreen()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFFF7A00),
+                                width: 2,
+                              ),
+                              color: const Color(0xFFFF7A00).withOpacity(0.1),
+                            ),
+                            child: const Text(
+                              'Create new account',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xFFFF7A00),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),

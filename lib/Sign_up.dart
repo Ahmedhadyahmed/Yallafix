@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'firebase_auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseSignUpScreen extends StatefulWidget {
   const FirebaseSignUpScreen({Key? key}) : super(key: key);
@@ -9,7 +9,6 @@ class FirebaseSignUpScreen extends StatefulWidget {
 }
 
 class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
-  bool rememberMe = false;
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -28,7 +27,25 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
   String? passwordError;
   String? confirmPasswordError;
 
-  final FirebaseAuthService _authService = FirebaseAuthService();
+  // List of allowed email domains
+  final List<String> allowedEmailDomains = [
+    'gmail.com',
+    'yahoo.com',
+    'yahoo.co.uk',
+    'yahoo.ca',
+    'yahoo.com.au',
+    'outlook.com',
+    'hotmail.com',
+    'live.com',
+    'msn.com',
+    'icloud.com',
+    'me.com',
+    'mac.com',
+    'aol.com',
+    'protonmail.com',
+    'mail.com',
+    'zoho.com',
+  ];
 
   @override
   void dispose() {
@@ -40,17 +57,22 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     super.dispose();
   }
 
-  // Email validation function
+  // Enhanced email validation function
   bool isValidEmail(String email) {
     final RegExp emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
-    return emailRegex.hasMatch(email);
+
+    if (!emailRegex.hasMatch(email)) {
+      return false;
+    }
+
+    String domain = email.split('@').last.toLowerCase();
+    return allowedEmailDomains.contains(domain);
   }
 
   // Password validation function
   bool isValidPassword(String password) {
-    // Password should be at least 6 characters (Firebase minimum)
     return password.length >= 6;
   }
 
@@ -58,14 +80,12 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
   bool validateForm() {
     bool isValid = true;
     setState(() {
-      // Clear previous errors
       nameError = null;
       usernameError = null;
       emailError = null;
       passwordError = null;
       confirmPasswordError = null;
 
-      // Name validation
       if (nameController.text.trim().isEmpty) {
         nameError = 'Name is required';
         isValid = false;
@@ -74,7 +94,6 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         isValid = false;
       }
 
-      // Username validation
       if (usernameController.text.trim().isEmpty) {
         usernameError = 'Username is required';
         isValid = false;
@@ -86,16 +105,21 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         isValid = false;
       }
 
-      // Email validation
       if (emailController.text.trim().isEmpty) {
         emailError = 'Email is required';
         isValid = false;
       } else if (!isValidEmail(emailController.text.trim())) {
-        emailError = 'Please enter a valid email address';
+        final RegExp basicEmailRegex = RegExp(
+          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+        );
+        if (!basicEmailRegex.hasMatch(emailController.text.trim())) {
+          emailError = 'Please enter a valid email address';
+        } else {
+          emailError = 'Please use Gmail, Yahoo, Outlook, or other popular email providers';
+        }
         isValid = false;
       }
 
-      // Password validation
       if (passwordController.text.isEmpty) {
         passwordError = 'Password is required';
         isValid = false;
@@ -104,7 +128,6 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         isValid = false;
       }
 
-      // Confirm password validation
       if (confirmPasswordController.text.isEmpty) {
         confirmPasswordError = 'Please confirm your password';
         isValid = false;
@@ -117,7 +140,12 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     return isValid;
   }
 
-  // Handle form submission with Firebase
+  // Navigate back to login screen
+  void _navigateToLogin() {
+    Navigator.of(context).pop();
+  }
+
+  // Simple Firebase Auth signup without Firestore
   Future<void> handleSignUp() async {
     if (!validateForm()) {
       return;
@@ -128,14 +156,17 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     });
 
     try {
-      final user = await _authService.signUpWithEmailAndPassword(
-        name: nameController.text.trim(),
-        username: usernameController.text.trim(),
+      // Direct Firebase Auth signup - no Firestore involved
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      if (user != null && mounted) {
+      // Update display name
+      await userCredential.user?.updateDisplayName(nameController.text.trim());
+
+      if (mounted) {
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Account created successfully! You can now log in.'),
@@ -144,20 +175,29 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
           ),
         );
 
-        // Add a delay before navigating back to login screen
-        await Future.delayed(const Duration(milliseconds: 1500));
+        // Wait exactly 2 seconds then navigate to login
+        await Future.delayed(const Duration(seconds: 2));
 
         if (mounted) {
-          Navigator.pop(context);
+          _navigateToLogin();
         }
       }
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       if (mounted) {
-        String errorMessage = e.toString();
+        String errorMessage;
 
-        // Clean up error messages
-        if (errorMessage.contains('Exception: ')) {
-          errorMessage = errorMessage.replaceFirst('Exception: ', '');
+        switch (e.code) {
+          case 'email-already-in-use':
+            errorMessage = 'This email is already registered. Please use a different email or try logging in.';
+            break;
+          case 'weak-password':
+            errorMessage = 'Password is too weak. Please choose a stronger password.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Please enter a valid email address.';
+            break;
+          default:
+            errorMessage = 'Sign up failed: ${e.message}';
         }
 
         showDialog(
@@ -166,6 +206,26 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
             return AlertDialog(
               title: const Text('Sign Up Failed'),
               content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Sign Up Failed'),
+              content: Text('An unexpected error occurred: ${e.toString()}'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -335,7 +395,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        hintText: 'Enter your email...',
+                        hintText: 'Enter your email (Gmail, Yahoo, etc.)...',
                         hintStyle: const TextStyle(
                           color: Color(0xFF9CA3AF),
                           fontSize: 14,
@@ -538,30 +598,48 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                   const SizedBox(height: 30),
 
-                  // Already have an account
+                  // Already have an account - BIGGER and MORE CLICKABLE
                   Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: RichText(
-                        text: const TextSpan(
-                          text: 'Already have an account ? ',
-                          style: TextStyle(
-                            color: Color(0xFF374151),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          _navigateToLogin();
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
                           ),
-                          children: [
-                            TextSpan(
-                              text: 'Login',
-                              style: TextStyle(
-                                color: Color(0xFFFF7A00),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFFFF7A00).withOpacity(0.3),
+                              width: 1,
                             ),
-                          ],
+                          ),
+                          child: RichText(
+                            text: const TextSpan(
+                              text: 'Already have an account? ',
+                              style: TextStyle(
+                                color: Color(0xFF374151),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'Login',
+                                  style: TextStyle(
+                                    color: Color(0xFFFF7A00),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -586,6 +664,76 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         ),
       ),
     );
+  }
+
+  // Direct Firebase Auth signup without custom service
+  Future<void> _signUpDirectly() async {
+    if (!validateForm()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Create user with Firebase Auth only
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      // Update display name
+      await userCredential.user?.updateDisplayName(nameController.text.trim());
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully! Redirecting to login...'),
+            backgroundColor: Color(0xFFFF7A00),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Wait exactly 2 seconds
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          _navigateToLogin();
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        String errorMessage;
+        switch (e.code) {
+          case 'email-already-in-use':
+            errorMessage = 'This email is already registered.';
+            break;
+          case 'weak-password':
+            errorMessage = 'Password is too weak.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Invalid email address.';
+            break;
+          default:
+            errorMessage = e.message ?? 'Sign up failed';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }
 
