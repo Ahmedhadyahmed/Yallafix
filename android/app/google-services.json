@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "275792244923",
+    "project_id": "yalla-fix-b3ed2",
+    "storage_bucket": "yalla-fix-b3ed2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275792244923:android:eee97ac4a16c841698f99e",
+        "android_client_info": {
+          "package_name": "com.example.yala_fix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUvq8MwQIiMyFPvnko7m9PTg5mnniwA64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
