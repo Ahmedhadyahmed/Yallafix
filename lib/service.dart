@@ -16,6 +16,9 @@ class _ServicesPageState extends State<ServicesPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // Payment method state
+  String _selectedPaymentMethod = 'cash'; // Default payment method
+
   // Updated API Configuration with your mock API endpoints
   static const String baseUrl = 'https://mock-api.net/api/task-two';
 
@@ -125,6 +128,8 @@ class _ServicesPageState extends State<ServicesPage> {
 
   // Navigate to map screen for service booking
   void _navigateToMapForService(ServiceItem service) async {
+    print('Navigating to map for service: ${service.title}'); // Debug log
+
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
@@ -136,124 +141,375 @@ class _ServicesPageState extends State<ServicesPage> {
       ),
     );
 
+    print('Navigation result: $result'); // Debug log
+
     // Handle the returned data from map screen
     if (result != null && result['location'] != null) {
       final selectedLocation = result['location'];
       final selectedAddress = result['address'];
-      final serviceItem = result['service'];
+
+      print('Location selected: $selectedAddress'); // Debug log
+
+      // Add a small delay to ensure the dialog shows properly after navigation
+      await Future.delayed(const Duration(milliseconds: 500));
 
       // Show booking confirmation dialog with location details
-      _showBookingConfirmationDialog(service, selectedLocation, selectedAddress);
+      if (mounted) {
+        print('Showing booking confirmation dialog'); // Debug log
+        _showBookingConfirmationDialog(service, selectedLocation, selectedAddress);
+      }
+    } else {
+      print('No location data received from map'); // Debug log
     }
   }
 
-  // Show booking confirmation with location details
+  // Show booking confirmation with location details and payment method selection
   void _showBookingConfirmationDialog(ServiceItem service, dynamic location, String? address) {
+    // Reset payment method selection for new booking
+    _selectedPaymentMethod = 'cash';
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Service Booking'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Service info
-            Row(
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                color: Colors.green,
+                size: 28,
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Confirm Service Booking',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Service info
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: service.color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[200]!),
                   ),
-                  child: Icon(
-                    service.icon,
-                    color: service.color,
-                    size: 24,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: service.color.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          service.icon,
+                          color: service.color,
+                          size: 24,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              service.title,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Price: ${service.price}',
+                              style: TextStyle(
+                                color: Color(0xFFFF8C00),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              'ETA: ${service.eta}',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 12),
-                Expanded(
+                SizedBox(height: 16),
+
+                // Location info
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.blue[200]!),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.place, color: Colors.red, size: 24),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Service Location:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              address ?? 'Selected location on map',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                                height: 1.3,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Payment method selection
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange[200]!),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        service.title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Row(
+                        children: [
+                          Icon(Icons.payment, color: Colors.orange[700], size: 24),
+                          SizedBox(width: 8),
+                          Text(
+                            'Payment Method',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+
+                      // Cash payment option
+                      _buildPaymentOption(
+                        value: 'cash',
+                        title: 'Cash',
+                        subtitle: 'Pay with cash on service completion',
+                        icon: Icons.money,
+                        color: Colors.green,
+                        setDialogState: setDialogState,
+                      ),
+                      SizedBox(height: 8),
+
+                      // Saved card option
+                      _buildPaymentOption(
+                        value: 'card',
+                        title: 'Saved Card',
+                        subtitle: 'Pay with saved card ending in ****1234',
+                        icon: Icons.credit_card,
+                        color: Colors.blue,
+                        setDialogState: setDialogState,
+                      ),
+                      SizedBox(height: 8),
+
+                      // Fawry option
+                      _buildPaymentOption(
+                        value: 'fawry',
+                        title: 'Fawry',
+                        subtitle: 'Pay using Fawry wallet',
+                        icon: Icons.account_balance_wallet,
+                        color: Colors.purple,
+                        setDialogState: setDialogState,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Confirmation message
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green[200]!),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.green[700], size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Please confirm your service booking and payment details.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.green[800],
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                      Text(
-                        'Price: ${service.price}',
-                        style: TextStyle(
-                          color: Color(0xFFFF8C00),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text('ETA: ${service.eta}'),
                     ],
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            Divider(),
-            SizedBox(height: 8),
-
-            // Location info
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.place, color: Colors.red, size: 20),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Service Location:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        address ?? 'Selected location on map',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 16,
                 ),
-              ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _processBooking(service, address, _selectedPaymentMethod);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF8C00),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Confirm Booking',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+      ),
+    );
+  }
+
+  // Helper widget to build payment option tiles
+  Widget _buildPaymentOption({
+    required String value,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required StateSetter setDialogState,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        setDialogState(() {
+          _selectedPaymentMethod = value;
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _selectedPaymentMethod == value
+              ? color.withOpacity(0.1)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _selectedPaymentMethod == value
+                ? color
+                : Colors.grey[300]!,
+            width: _selectedPaymentMethod == value ? 2 : 1,
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _processBooking(service, address);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF8C00),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
             ),
-            child: Text(
-              'Confirm Booking',
-              style: TextStyle(color: Colors.white),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Radio<String>(
+              value: value,
+              groupValue: _selectedPaymentMethod,
+              onChanged: (String? newValue) {
+                setDialogState(() {
+                  _selectedPaymentMethod = newValue!;
+                });
+              },
+              activeColor: color,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -293,7 +549,7 @@ class _ServicesPageState extends State<ServicesPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _processBooking(service, null);
+              _processBooking(service, null, 'cash');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF8C00),
@@ -308,23 +564,231 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
-  // Process the final booking
-  void _processBooking(ServiceItem service, String? location) {
-    String message = '${service.title} booked successfully! We\'ll be there in ${service.eta}';
+  // Process the final booking with payment method
+  void _processBooking(ServiceItem service, String? location, String paymentMethod) {
+    String paymentMethodText = _getPaymentMethodDisplayText(paymentMethod);
+
+    String message = '${service.title} booked successfully!\nWe\'ll be there in ${service.eta}\nPayment: $paymentMethodText';
     if (location != null) {
-      message += '\nLocation: ${location.length > 50 ? location.substring(0, 50) + '...' : location}';
+      String shortLocation = location.length > 40 ? '${location.substring(0, 40)}...' : location;
+      message += '\nLocation: $shortLocation';
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  'Booking Confirmed!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            Text(
+              message,
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 4),
+        duration: Duration(seconds: 6),
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
+        action: SnackBarAction(
+          label: 'View Details',
+          textColor: Colors.white,
+          onPressed: () {
+            _showBookingDetailsDialog(service, location, paymentMethod);
+          },
+        ),
+      ),
+    );
+  }
+
+  String _getPaymentMethodDisplayText(String paymentMethod) {
+    switch (paymentMethod) {
+      case 'cash':
+        return 'Cash on service';
+      case 'card':
+        return 'Saved card ****1234';
+      case 'fawry':
+        return 'Fawry wallet';
+      default:
+        return 'Unknown payment method';
+    }
+  }
+
+  // Show detailed booking information with payment details
+  void _showBookingDetailsDialog(ServiceItem service, String? location, String paymentMethod) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.receipt_long, color: Color(0xFFFF8C00)),
+            SizedBox(width: 12),
+            Text('Booking Details'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow('Service', service.title),
+            _buildDetailRow('Price', service.price),
+            _buildDetailRow('ETA', service.eta),
+            _buildDetailRow('Rating', '${service.rating}'),
+            _buildDetailRow('Payment', _getPaymentMethodDisplayText(paymentMethod)),
+            if (location != null) _buildDetailRow('Location', location),
+            SizedBox(height: 16),
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green[200]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.green[700], size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'You will receive updates about your booking via notifications.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.green[800],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 8),
+            // Payment specific information
+            _buildPaymentInfoContainer(paymentMethod),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF8C00),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Got it',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentInfoContainer(String paymentMethod) {
+    Color color;
+    Color textColor;
+    IconData icon;
+    String message;
+
+    switch (paymentMethod) {
+      case 'cash':
+        color = Colors.green;
+        textColor = Colors.green[800]!;
+        icon = Icons.money;
+        message = 'Please have exact cash ready for the service provider.';
+        break;
+      case 'card':
+        color = Colors.blue;
+        textColor = Colors.blue[800]!;
+        icon = Icons.credit_card;
+        message = 'Payment will be charged to your saved card upon service completion.';
+        break;
+      case 'fawry':
+        color = Colors.purple;
+        textColor = Colors.purple[800]!;
+        icon = Icons.account_balance_wallet;
+        message = 'Payment will be processed through your Fawry wallet.';
+        break;
+      default:
+        color = Colors.grey;
+        textColor = Colors.grey[800]!;
+        icon = Icons.payment;
+        message = 'Payment details will be processed accordingly.';
+    }
+
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 12,
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -352,7 +816,7 @@ class _ServicesPageState extends State<ServicesPage> {
           'Services',
           style: TextStyle(
             color: Color(0xFFFF8C00),
-            fontSize: 28,
+            fontSize: 24,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -380,7 +844,7 @@ class _ServicesPageState extends State<ServicesPage> {
             Text(
               'Loading services...',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Colors.grey,
               ),
             ),
@@ -403,7 +867,7 @@ class _ServicesPageState extends State<ServicesPage> {
             Text(
               'Oops! Something went wrong',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 color: Colors.grey[600],
                 fontWeight: FontWeight.w600,
               ),
@@ -483,12 +947,12 @@ class _ServicesPageState extends State<ServicesPage> {
                   hintText: 'Search for services...',
                   hintStyle: TextStyle(
                     color: Colors.black54,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -563,7 +1027,7 @@ class _ServicesPageState extends State<ServicesPage> {
           Text(
             'No services found',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               color: Colors.grey[600],
             ),
           ),
@@ -571,7 +1035,7 @@ class _ServicesPageState extends State<ServicesPage> {
           Text(
             'Try a different search term or category',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey[500],
             ),
           ),
@@ -637,7 +1101,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         Text(
                           service.title,
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: Colors.black87,
                           ),
@@ -646,7 +1110,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         Text(
                           service.description,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.grey[600],
                           ),
                         ),
@@ -686,7 +1150,7 @@ class _ServicesPageState extends State<ServicesPage> {
                             Text(
                               service.price,
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 color: Color(0xFFFF8C00),
                                 fontWeight: FontWeight.w700,
                               ),
@@ -784,7 +1248,7 @@ class _ServicesPageState extends State<ServicesPage> {
                               Text(
                                 service.title,
                                 style: const TextStyle(
-                                  fontSize: 26,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.black87,
                                 ),
@@ -793,7 +1257,7 @@ class _ServicesPageState extends State<ServicesPage> {
                               Text(
                                 service.description,
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   color: Colors.grey[600],
                                 ),
                               ),
@@ -828,7 +1292,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     const Text(
                       'Service Details',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.black87,
                       ),
@@ -837,7 +1301,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     Text(
                       'Our professional ${service.title.toLowerCase()} service provides reliable and efficient assistance for your vehicle needs. Available 24/7 with experienced technicians.',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         color: Colors.grey[700],
                         height: 1.5,
                       ),
@@ -861,7 +1325,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         child: const Text(
                           'Book Service - Choose Location',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
@@ -901,7 +1365,7 @@ class _ServicesPageState extends State<ServicesPage> {
           Text(
             value,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.black87,
               fontWeight: FontWeight.w600,
             ),

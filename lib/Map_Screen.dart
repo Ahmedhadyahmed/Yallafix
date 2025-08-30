@@ -132,7 +132,9 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     });
 
     _searchFocusNode.unfocus();
-    _navigateToSearchResult(result);
+
+    // Show confirmation dialog for search result
+    _showSearchResultConfirmationDialog(result);
   }
 
   void _togglePinSelectionMode() {
@@ -181,7 +183,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
         setState(() {
           _selectedLocationAddress = data['display_name'] ?? 'Unknown location';
         });
-        _showLocationSelectedDialog();
+        _showPinLocationSelectedDialog();
       }
     } catch (e) {
       print('Reverse geocoding error: $e');
@@ -192,6 +194,272 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     }
   }
 
+  // Updated method for pin location selection dialog
+  void _showPinLocationSelectedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.place, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Location Selected'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Selected location:'),
+            SizedBox(height: 8),
+            Text(
+              _selectedLocationAddress ?? 'Unknown location',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Coordinates: ${_selectedPinLocation!.latitude.toStringAsFixed(4)}, ${_selectedPinLocation!.longitude.toStringAsFixed(4)}',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+            if (widget.serviceItem != null) ...[
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Service: ${widget.serviceItem!.title}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _selectedPinLocation = null;
+                _selectedLocationAddress = null;
+              });
+            },
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close this dialog first
+              _confirmSelectedLocation(); // Then confirm and navigate back
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[800],
+            ),
+            child: Text(
+              'Confirm Location',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // New method for search result confirmation
+  void _showSearchResultConfirmationDialog(PlaceSearchResult result) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.search, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Location Found'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Found location:'),
+            SizedBox(height: 8),
+            Text(
+              result.name,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            SizedBox(height: 4),
+            Text(
+              result.address,
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Coordinates: ${result.location.latitude.toStringAsFixed(4)}, ${result.location.longitude.toStringAsFixed(4)}',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+            if (widget.serviceItem != null) ...[
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Service: ${widget.serviceItem!.title}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _clearSearchSelection();
+            },
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog first
+              _confirmSearchResult(result); // Then confirm and navigate back
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[800],
+            ),
+            child: Text(
+              'Confirm Location',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // New method for current location confirmation
+  void _showCurrentLocationConfirmationDialog() {
+    if (_currentLocation == null) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.my_location, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Current Location'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Use your current location:'),
+            SizedBox(height: 8),
+            Text(
+              'Current Position',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Coordinates: ${_currentLocation!.latitude.toStringAsFixed(4)}, ${_currentLocation!.longitude.toStringAsFixed(4)}',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+            if (widget.serviceItem != null) ...[
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Service: ${widget.serviceItem!.title}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog first
+              _confirmCurrentLocation(); // Then confirm and navigate back
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[800],
+            ),
+            child: Text(
+              'Confirm Location',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // New method to confirm search result
+  void _confirmSearchResult(PlaceSearchResult result) {
+    // Show success message
+    _showSuccessSnackBar('Location confirmed: ${result.name}');
+    // Navigate back with search result data
+    Navigator.pop(context, {
+      'location': result.location,
+      'address': result.displayName,
+      'service': widget.serviceItem,
+    });
+  }
+
+  // New method to confirm current location
+  void _confirmCurrentLocation() {
+    if (_currentLocation != null) {
+      // Show success message
+      _showSuccessSnackBar('Current location confirmed');
+      // Navigate back with current location data
+      Navigator.pop(context, {
+        'location': _currentLocation,
+        'address': 'Current Location',
+        'service': widget.serviceItem,
+      });
+    }
+  }
   void _showLocationSelectedDialog() {
     showDialog(
       context: context,
@@ -218,6 +486,29 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
               'Coordinates: ${_selectedPinLocation!.latitude.toStringAsFixed(4)}, ${_selectedPinLocation!.longitude.toStringAsFixed(4)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
+            if (widget.serviceItem != null) ...[
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Service: ${widget.serviceItem!.title}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
         actions: [
@@ -233,8 +524,8 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              _confirmSelectedLocation();
+              Navigator.of(context).pop(); // Close this dialog first
+              _confirmSelectedLocation(); // Then confirm and navigate back
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[800],
@@ -249,46 +540,22 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     );
   }
 
+  // Updated _confirmSelectedLocation method
   void _confirmSelectedLocation() {
     if (_selectedPinLocation != null) {
-      setState(() {
-        _searchMarker = Marker(
-          point: _selectedPinLocation!,
-          child: GestureDetector(
-            onTap: () => _showMarkerInfo(
-                'Selected Location',
-                _selectedLocationAddress ?? 'Custom selected location'
-            ),
-            child: Container(
-              width: 40,
-              height: 40,
-              child: Icon(
-                Icons.place,
-                color: Colors.red,
-                size: 40,
-              ),
-            ),
-          ),
-        );
-        _isPinSelectionMode = false;
-      });
-
-      // Show success message and navigate back
+      // Show success message
       _showSuccessSnackBar('Location confirmed and marked on map');
-
-      // Navigate back to services screen with location data
-      Future.delayed(Duration(milliseconds: 1500), () {
-        Navigator.pop(context, {
-          'location': _selectedPinLocation,
-          'address': _selectedLocationAddress,
-          'service': widget.serviceItem,
-        });
+      // Navigate back immediately with location data
+      Navigator.pop(context, {
+        'location': _selectedPinLocation,
+        'address': _selectedLocationAddress,
+        'service': widget.serviceItem,
       });
-
-      // Reset selection state
+      // Reset selection state after navigation
       setState(() {
         _selectedPinLocation = null;
         _selectedLocationAddress = null;
+        _isPinSelectionMode = false;
       });
     }
   }
@@ -391,6 +658,11 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
       });
 
       _showSuccessSnackBar('Location updated successfully');
+
+      // If user requested current location, show confirmation dialog
+      if (_currentLocation != null) {
+        _showCurrentLocationConfirmationDialog();
+      }
     } catch (e) {
       print('Error getting location: $e');
       _showErrorSnackBar('Failed to get current location');
@@ -404,6 +676,8 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
   void _moveToCurrentLocation() {
     if (_currentLocation != null) {
       _mapController.move(_currentLocation!, 15.0);
+      // Show confirmation dialog for current location
+      _showCurrentLocationConfirmationDialog();
     } else {
       _getCurrentLocation();
     }
