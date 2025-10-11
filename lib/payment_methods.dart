@@ -27,8 +27,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFFFF7ED), // orange-50
-              Color(0xFFFEF3C7), // amber-50
+              Color(0xFFFFF9F5),
+              Color(0xFFFAF5F0),
             ],
           ),
         ),
@@ -38,51 +38,51 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               // Header
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFFFB923C), // orange-400
-                      Color(0xFFFBBF24), // amber-400
-                    ],
-                  ),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 24,
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFB923C).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Color(0xFFFB923C),
+                              size: 22,
+                            ),
                           ),
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(),
                         ),
                         SizedBox(width: 16),
-                        Text(
-                          'Payment Methods',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Payment Methods',
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1F2937),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Manage your payment options',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF9CA3AF),
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                    SizedBox(height: 4),
-                    Padding(
-                      padding: EdgeInsets.only(left: 40),
-                      child: Text(
-                        'Manage your payment options',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFFFED7AA), // orange-100
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -90,17 +90,15 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.all(24),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Column(
                     children: [
-                      // Digital Wallet Card
                       _buildWalletCard(),
-                      SizedBox(height: 24),
-                      // Payment Methods List
+                      SizedBox(height: 28),
                       _buildPaymentMethodsList(),
-                      SizedBox(height: 24),
-                      // Add Payment Method Button
+                      SizedBox(height: 28),
                       _buildAddPaymentButton(),
+                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -115,25 +113,27 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget _buildWalletCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFFB923C),
+            Color(0xFFFBBF24),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            color: Color(0xFFFB923C).withOpacity(0.25),
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
         ],
-        border: Border(
-          left: BorderSide(
-            color: Color(0xFFFB923C),
-            width: 4,
-          ),
-        ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,78 +141,69 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFFB923C),
-                          Color(0xFFFBBF24),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       Icons.account_balance_wallet,
                       color: Colors.white,
-                      size: 24,
+                      size: 26,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Digital Wallet',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF1F2937),
+                          color: Colors.white,
                         ),
                       ),
+                      SizedBox(height: 2),
                       Text(
                         'Your app balance',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF6B7280),
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.8),
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'EGP ${walletBalance.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 20),
+          Text(
+            'EGP ${walletBalance.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 14),
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFFED7AA), // orange-100
-                  Color(0xFFFEF3C7), // amber-100
-                ],
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2),
               ),
-              borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'Use your wallet for quick and secure payments within the app',
+              'Quick and secure payments within the app',
               style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF92400E), // orange-800
+                fontSize: 13,
+                color: Colors.white.withOpacity(0.9),
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),
@@ -222,61 +213,66 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   }
 
   Widget _buildPaymentMethodsList() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Saved Payment Methods',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1F2937),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Saved Payment Methods',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1F2937),
-            ),
-          ),
-          SizedBox(height: 16),
-          ...paymentMethods.map((method) => _buildPaymentMethodItem(method)).toList(),
-        ],
-      ),
+        ),
+        SizedBox(height: 14),
+        ...paymentMethods.asMap().entries.map((entry) {
+          int index = entry.key;
+          PaymentMethod method = entry.value;
+          return Column(
+            children: [
+              _buildPaymentMethodItem(method),
+              if (index < paymentMethods.length - 1)
+                SizedBox(height: 12),
+            ],
+          );
+        }).toList(),
+      ],
     );
   }
 
   Widget _buildPaymentMethodItem(PaymentMethod method) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFFE5E7EB)),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Color(0xFFE5E7EB),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(8),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Color(0xFFFED7AA), // orange-100
-              borderRadius: BorderRadius.circular(8),
+              color: Color(0xFFFED7AA),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               _getPaymentMethodIcon(method.type),
-              color: Color(0xFFDC2626),
-              size: 20,
+              color: Color(0xFFFB923C),
+              size: 22,
             ),
           ),
-          SizedBox(width: 12),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,38 +280,58 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 Text(
                   method.name,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF1F2937),
                   ),
                 ),
-                if (method.isDefault)
+                if (method.isDefault) ...[
+                  SizedBox(height: 6),
                   Container(
-                    margin: EdgeInsets.only(top: 4),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Color(0xFFFED7AA),
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFEF3C7),
+                          Color(0xFFFED7AA),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'Default',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF92400E),
-                        fontWeight: FontWeight.w500,
+                        fontSize: 11,
+                        color: Color(0xFFB45309),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
+                ],
               ],
             ),
           ),
-          TextButton(
-            onPressed: () {},
-            child: Text(
-              'Edit',
-              style: TextStyle(
-                color: Color(0xFFDC2626),
-                fontWeight: FontWeight.w500,
+          Container(
+            decoration: BoxDecoration(
+              color: Color(0xFFFED7AA).withOpacity(0.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Text(
+                    'Edit',
+                    style: TextStyle(
+                      color: Color(0xFFFB923C),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -327,45 +343,42 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget _buildAddPaymentButton() {
     return Container(
       width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: _showAddPaymentMethodModal,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ).copyWith(
-          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFFB923C),
+            Color(0xFFFBBF24),
+          ],
         ),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFFB923C),
-                Color(0xFFFBBF24),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFFB923C).withOpacity(0.3),
+            blurRadius: 16,
+            offset: Offset(0, 6),
           ),
-          child: Container(
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Add Payment Method',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _showAddPaymentMethodModal,
+          borderRadius: BorderRadius.circular(14),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add, color: Colors.white, size: 22),
+              SizedBox(width: 8),
+              Text(
+                'Add Payment Method',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -412,7 +425,6 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
   PaymentMethodType? selectedType;
   final _formKey = GlobalKey<FormState>();
 
-  // Form controllers
   final _cardNumberController = TextEditingController();
   final _expiryDateController = TextEditingController();
   final _cvvController = TextEditingController();
@@ -428,8 +440,8 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
       ),
       child: Padding(
@@ -443,32 +455,45 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               Container(
-                padding: EdgeInsets.all(24),
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Add Payment Method',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF1F2937),
                       ),
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.close),
-                      color: Color(0xFF6B7280),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          color: Color(0xFF6B7280),
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              // Content
               Flexible(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.all(24),
                   child: selectedType == null ? _buildPaymentTypeSelection() : _buildPaymentForm(),
                 ),
               ),
@@ -488,21 +513,21 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           'Credit/Debit Card',
           'Visa, Mastercard, etc.',
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 12),
         _buildPaymentTypeOption(
           PaymentMethodType.fawry,
           Icons.payment,
           'Fawry',
           'Pay with Fawry',
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 12),
         _buildPaymentTypeOption(
           PaymentMethodType.cash,
           Icons.money,
           'Cash',
           'Pay on delivery',
         ),
-        SizedBox(height: 24),
+        SizedBox(height: 20),
       ],
     );
   }
@@ -519,12 +544,20 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(color: Color(0xFFE5E7EB)),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
+          color: Colors.white,
         ),
         child: Row(
           children: [
-            Icon(icon, color: Color(0xFFDC2626), size: 24),
-            SizedBox(width: 12),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Color(0xFFFED7AA),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: Color(0xFFFB923C), size: 24),
+            ),
+            SizedBox(width: 14),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -532,15 +565,16 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF1F2937),
                   ),
                 ),
+                SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF6B7280),
+                    fontSize: 13,
+                    color: Color(0xFF9CA3AF),
                   ),
                 ),
               ],
@@ -556,37 +590,43 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
       key: _formKey,
       child: Column(
         children: [
-          // Back button
           Row(
             children: [
-              TextButton.icon(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   setState(() {
                     selectedType = null;
                   });
                 },
-                icon: Icon(Icons.arrow_back, color: Color(0xFFDC2626)),
-                label: Text(
-                  'Back to payment methods',
-                  style: TextStyle(color: Color(0xFFDC2626)),
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back, color: Color(0xFFFB923C), size: 20),
+                    SizedBox(width: 6),
+                    Text(
+                      'Back',
+                      style: TextStyle(
+                        color: Color(0xFFFB923C),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
-          // Form fields based on selected type
+          SizedBox(height: 20),
           if (selectedType == PaymentMethodType.card) ..._buildCardForm(),
           if (selectedType == PaymentMethodType.fawry) ..._buildFawryForm(),
           if (selectedType == PaymentMethodType.cash) ..._buildCashForm(),
           SizedBox(height: 24),
-          // Action buttons
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -596,34 +636,48 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                     'Cancel',
                     style: TextStyle(
                       color: Color(0xFF374151),
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 12),
               Expanded(
-                child: ElevatedButton(
-                  onPressed: _savePaymentMethod,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFB923C),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFB923C),
+                        Color(0xFFFBBF24),
+                      ],
                     ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                  child: ElevatedButton(
+                    onPressed: _savePaymentMethod,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 20),
         ],
       ),
     );
@@ -636,8 +690,10 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
         decoration: InputDecoration(
           labelText: 'Card Number',
           hintText: '1234 5678 9012 3456',
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -674,8 +730,10 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               decoration: InputDecoration(
                 labelText: 'Expiry Date',
                 hintText: 'MM/YY',
+                labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -702,8 +760,10 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               decoration: InputDecoration(
                 labelText: 'CVV',
                 hintText: '123',
+                labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -732,8 +792,10 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
         decoration: InputDecoration(
           labelText: 'Cardholder Name',
           hintText: 'John Doe',
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -757,8 +819,10 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
         decoration: InputDecoration(
           labelText: 'Fawry Number',
           hintText: 'Enter your Fawry number',
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -775,16 +839,18 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
       SizedBox(height: 16),
       Container(
         width: double.infinity,
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Color(0xFFFFF7ED),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Color(0xFFFED7AA)),
         ),
         child: Text(
           'You can pay using Fawry at any nearby Fawry outlet or through the Fawry mobile app.',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 13,
             color: Color(0xFF92400E),
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -799,8 +865,10 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           labelText: 'Cash Amount',
           hintText: '0.00',
           prefixText: 'EGP ',
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -818,16 +886,18 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
       SizedBox(height: 16),
       Container(
         width: double.infinity,
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Color(0xFFFFF7ED),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Color(0xFFFED7AA)),
         ),
         child: Text(
           'Cash payment will be collected upon delivery or at pickup location.',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 13,
             color: Color(0xFF92400E),
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -887,7 +957,6 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
   }
 }
 
-// Data Models
 enum PaymentMethodType { card, fawry, cash }
 
 class PaymentMethod {
@@ -906,7 +975,6 @@ class PaymentMethod {
   });
 }
 
-// Input Formatters
 class CardNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
