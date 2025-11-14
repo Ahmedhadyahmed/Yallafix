@@ -35,7 +35,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#2196F3',
       'eta': '15-20 mins',
       'rating': 4.8,
-      'price': '\$50-80',
+      'price': 'EGP50-80',
       'isNew': false,
       'description': 'Professional towing service',
       'category': 'Towing'
@@ -47,7 +47,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#FF5722',
       'eta': '20-30 mins',
       'rating': 4.7,
-      'price': '\$60-100',
+      'price': 'EGP60-100',
       'isNew': true,
       'description': 'Expert mechanical repairs',
       'category': 'Repair'
@@ -59,7 +59,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#4CAF50',
       'eta': '25-35 mins',
       'rating': 4.9,
-      'price': '\$30-50',
+      'price': 'EGP30-50',
       'isNew': false,
       'description': 'Quick oil change service',
       'category': 'Maintenance'
@@ -71,7 +71,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#FFC107',
       'eta': '10-15 mins',
       'rating': 4.6,
-      'price': '\$25-40',
+      'price': 'EGP25-40',
       'isNew': false,
       'description': 'Emergency battery jump start',
       'category': 'Emergency'
@@ -83,7 +83,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#9C27B0',
       'eta': '15-25 mins',
       'rating': 4.8,
-      'price': '\$35-60',
+      'price': 'EGP35-60',
       'isNew': true,
       'description': 'Flat tire replacement',
       'category': 'Emergency'
@@ -95,7 +95,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#FF9800',
       'eta': '20-30 mins',
       'rating': 4.7,
-      'price': '\$20-35',
+      'price': 'EGP20-35',
       'isNew': false,
       'description': 'Emergency fuel delivery',
       'category': 'Emergency'
@@ -107,7 +107,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#00BCD4',
       'eta': '30-45 mins',
       'rating': 4.9,
-      'price': '\EGP40-70',
+      'price': 'EGP40-70',
       'isNew': false,
       'description': 'Complete vehicle diagnostic',
       'category': 'Maintenance'
@@ -119,7 +119,7 @@ class _ServicesPageState extends State<ServicesPage> {
       'color': '#E91E63',
       'eta': '15-20 mins',
       'rating': 4.5,
-      'price': '\EGP30-50',
+      'price': 'EGP30-50',
       'isNew': true,
       'description': 'Car lockout assistance',
       'category': 'Emergency'

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'Sign_up.dart';
+import 'forget_password.dart'; // Add this import
 
 class FirebaseLoginScreen extends StatefulWidget {
   const FirebaseLoginScreen({Key? key, String? userType}) : super(key: key);
@@ -114,46 +115,14 @@ class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
     );
   }
 
-  Future<void> _handleForgotPassword() async {
-    if (_emailController.text.trim().isEmpty) {
-      _showErrorDialog('Please enter your email address first');
-      return;
-    }
-
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-        email: _emailController.text.trim(),
-      );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset email sent! Check your inbox.'),
-            backgroundColor: Color(0xFFFF7A00),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        String errorMessage;
-        switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'No account found with this email address.';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Please enter a valid email address.';
-            break;
-          default:
-            errorMessage = 'Failed to send reset email: ${e.message}';
-        }
-        _showErrorDialog(errorMessage);
-      }
-    } catch (e) {
-      if (mounted) {
-        _showErrorDialog('Failed to send reset email: $e');
-      }
-    }
+  // Updated method to navigate to ForgetPasswordScreen
+  void _handleForgotPassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ForgotPasswordScreen(),
+      ),
+    );
   }
 
   @override
