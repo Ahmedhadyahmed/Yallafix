@@ -11,6 +11,7 @@ import 'home_page.dart';
 import 'old_service.dart';
 import 'welcome_page.dart';
 import 'firebase_options.dart';
+import 'splash_screen.dart'; // Import the splash screen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,12 +36,13 @@ class RoadHelperApp extends StatelessWidget {
         fontFamily: 'SF Pro Display',
         useMaterial3: true,
       ),
-      // Use AuthWrapper to check if user is logged in
-      home: const AuthWrapper(),
+      // Start with SplashScreen instead of AuthWrapper
+      home: const SplashScreen(),
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/home': (context) => const MainPage(),
         '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/auth': (context) => const AuthWrapper(), // Add auth wrapper as a route
       },
       onGenerateRoute: (settings) {
         // Handle the /login route with arguments

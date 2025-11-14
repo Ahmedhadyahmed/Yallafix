@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
+/// ActivityPage displays the user's service activity history
+/// Shows upcoming, completed, and cancelled services with filtering and search capabilities
 class ActivityPage extends StatefulWidget {
   const ActivityPage({super.key});
 
@@ -10,27 +9,38 @@ class ActivityPage extends StatefulWidget {
   State<ActivityPage> createState() => _ActivityPageState();
 }
 
+/// State class for ActivityPage that manages activity data, filtering, and search
+/// Uses TickerProviderStateMixin for animation support
 class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMixin {
+  // Currently selected filter index (0=All, 1=Upcoming, 2=Completed, 3=Cancelled)
   int _selectedFilterIndex = 0;
+
+  // Available filter options displayed as chips
   final List<String> _filterOptions = ['All', 'Upcoming', 'Completed', 'Cancelled'];
+
+  // Animation controller for smooth transitions
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
+  // Search functionality state
   String _searchQuery = '';
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
 
-  // Updated to load from API
-  List<ActivityItemData> _allActivities = [];
-  bool _isLoading = true;
-  String? _errorMessage;
+  // Activity data with mock content
+  late List<ActivityItemData> _allActivities;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize animation controller with 300ms duration
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
+
+    // Create fade animation from transparent to opaque
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -39,69 +49,150 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
       curve: Curves.easeInOut,
     ));
 
-    // Load activities from API
-    _loadActivities();
+    // Load mock activities
+    _allActivities = _getMockActivities();
+
+    // Start fade-in animation
     _animationController.forward();
   }
 
-  // Load activities from API
-  Future<void> _loadActivities() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final activities = await _loadActivitiesFromApi();
-      setState(() {
-        _allActivities = activities;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = e.toString();
-      });
-    }
-  }
-
-  // Fetch activities from API
-  Future<List<ActivityItemData>> _loadActivitiesFromApi() async {
-    try {
-      // Updated to use your MockAPI endpoint
-      final url = Uri.parse("https://mock-api.net/api/task-two/activities");
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final List<dynamic> activitiesJson = json.decode(response.body);
-        return activitiesJson
-            .map((json) => ActivityItemData.fromJson(json))
-            .toList();
-      } else {
-        throw Exception("Failed to load activities: ${response.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Error fetching activities: $e");
-    }
+  /// Returns a list of mock activities for testing
+  List<ActivityItemData> _getMockActivities() {
+    return [
+      ActivityItemData(
+        id: '1',
+        serviceName: 'Tow Service',
+        date: 'Nov 15, 2025 - 10:00 AM',
+        status: ActivityStatus.upcoming,
+        price: '\$120.00',
+        rating: null,
+        description: 'Vehicle towing from downtown to repair shop',
+        serviceProvider: 'Quick Tow Services',
+        comments: null, // no comments yet
+      ),
+      ActivityItemData(
+        id: '2',
+        serviceName: 'Battery Service',
+        date: 'Nov 10, 2025 - 2:30 PM',
+        status: ActivityStatus.completed,
+        price: '\$85.00',
+        rating: 4.5,
+        description: 'Battery replacement and electrical system check',
+        serviceProvider: 'Auto Care Plus',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '3',
+        serviceName: 'Mobile Mechanic',
+        date: 'Nov 8, 2025 - 9:00 AM',
+        status: ActivityStatus.completed,
+        price: '\$150.00',
+        rating: 5.0,
+        description: 'On-site engine diagnostics and minor repairs',
+        serviceProvider: 'Mobile Auto Experts',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '4',
+        serviceName: 'Oil Change',
+        date: 'Nov 5, 2025 - 11:00 AM',
+        status: ActivityStatus.cancelled,
+        price: '\$45.00',
+        rating: null,
+        description: 'Synthetic oil change and filter replacement',
+        serviceProvider: 'Express Lube',
+        comments: 'User cancelled due to schedule conflict',
+      ),
+      ActivityItemData(
+        id: '5',
+        serviceName: 'Tire Service',
+        date: 'Nov 20, 2025 - 3:00 PM',
+        status: ActivityStatus.upcoming,
+        price: '\$200.00',
+        rating: null,
+        description: 'Four tire rotation and balance',
+        serviceProvider: 'Tire World',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '6',
+        serviceName: 'Brake Service',
+        date: 'Oct 28, 2025 - 1:00 PM',
+        status: ActivityStatus.completed,
+        price: '\$320.00',
+        rating: 4.8,
+        description: 'Front brake pad replacement and rotor resurfacing',
+        serviceProvider: 'Brake Masters',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '7',
+        serviceName: 'Car Wash',
+        date: 'Nov 12, 2025 - 4:00 PM',
+        status: ActivityStatus.completed,
+        price: '\$25.00',
+        rating: null,
+        description: 'Premium wash and interior cleaning',
+        serviceProvider: 'Shine Auto Spa',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '8',
+        serviceName: 'AC Service',
+        date: 'Nov 18, 2025 - 10:30 AM',
+        status: ActivityStatus.upcoming,
+        price: '\$95.00',
+        rating: null,
+        description: 'Air conditioning recharge and system inspection',
+        serviceProvider: 'Cool Ride Services',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '9',
+        serviceName: 'Jump Start',
+        date: 'Oct 30, 2025 - 8:45 AM',
+        status: ActivityStatus.completed,
+        price: '\$40.00',
+        rating: 4.2,
+        description: 'Emergency jump start service',
+        serviceProvider: 'Roadside Heroes',
+        comments: null,
+      ),
+      ActivityItemData(
+        id: '10',
+        serviceName: 'Windshield Repair',
+        date: 'Nov 3, 2025 - 2:00 PM',
+        status: ActivityStatus.cancelled,
+        price: '\$75.00',
+        rating: null,
+        description: 'Small chip repair on front windshield',
+        serviceProvider: 'Glass Fix Pro',
+        comments: 'Provider could not service on the requested date',
+      ),
+    ];
   }
 
   @override
   void dispose() {
+    // Clean up resources to prevent memory leaks
     _animationController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
+  /// Returns filtered activities based on selected filter and search query
+  /// Applies both status filter and text search
   List<ActivityItemData> get _filteredActivities {
     List<ActivityItemData> filtered = _allActivities;
 
-    // Apply status filter
+    // Apply status filter (All, Upcoming, Completed, Cancelled)
     if (_selectedFilterIndex != 0) {
+      // Convert filter index to ActivityStatus enum
       ActivityStatus filterStatus = ActivityStatus.values[_selectedFilterIndex - 1];
       filtered = filtered.where((activity) => activity.status == filterStatus).toList();
     }
 
-    // Apply search filter
+    // Apply search filter - searches in service name, provider, and description
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((activity) =>
       activity.serviceName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -112,6 +203,8 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
     return filtered;
   }
 
+  /// Toggles search mode on/off
+  /// Clears search query when exiting search mode
   void _toggleSearch() {
     setState(() {
       _isSearching = !_isSearching;
@@ -122,17 +215,26 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
     });
   }
 
+  /// Simulates refresh with a delay
+  Future<void> _refreshActivities() async {
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() {
+      // Data is already loaded, just trigger rebuild
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFFF8F9FA), // Light grey background
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
+        elevation: 0, // Flat design
+        // Show search field when in search mode, otherwise show title
         title: _isSearching
             ? TextField(
           controller: _searchController,
-          autofocus: true,
+          autofocus: true, // Auto-focus when entering search mode
           decoration: const InputDecoration(
             hintText: 'Search activities...',
             border: InputBorder.none,
@@ -148,12 +250,13 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
             : const Text(
           'Activity',
           style: TextStyle(
-            color: Color(0xFFFF8C00),
+            color: Color(0xFFFF8C00), // Brand orange
             fontSize: 28,
             fontWeight: FontWeight.w700,
           ),
         ),
         actions: [
+          // Toggle between search and close icon
           IconButton(
             icon: Icon(
               _isSearching ? Icons.close : Icons.search,
@@ -164,24 +267,17 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
           const SizedBox(width: 8),
         ],
       ),
-      body: _isLoading
-          ? const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF8C00)),
-        ),
-      )
-          : _errorMessage != null
-          ? _buildErrorState()
-          : FadeTransition(
+      body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
           children: [
-            // Enhanced Filter Section
+            // Filter chips section (All, Upcoming, Completed, Cancelled)
             Container(
               height: 60,
               color: Colors.white,
               child: Column(
                 children: [
+                  // Horizontal scrollable filter chips
                   SizedBox(
                     height: 50,
                     child: ListView.builder(
@@ -199,6 +295,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                               selected: isSelected,
                               onSelected: (bool selected) {
                                 setState(() {
+                                  // Update selected filter
                                   _selectedFilterIndex = selected ? index : 0;
                                 });
                               },
@@ -223,6 +320,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                       },
                     ),
                   ),
+                  // Divider line below filters
                   Container(
                     height: 1,
                     color: Colors.grey.shade200,
@@ -230,7 +328,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                 ],
               ),
             ),
-            // Results count and sort
+            // Results count and sort button
             if (_filteredActivities.isNotEmpty)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -238,6 +336,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Display count of filtered activities
                     Text(
                       '${_filteredActivities.length} ${_filteredActivities.length == 1 ? 'activity' : 'activities'}',
                       style: TextStyle(
@@ -246,9 +345,10 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    // Sort button (functionality not yet implemented)
                     TextButton.icon(
                       onPressed: () {
-                        // Add sort functionality here
+                        // TODO: Add sort functionality
                       },
                       icon: const Icon(Icons.sort, size: 16),
                       label: const Text('Sort'),
@@ -260,19 +360,20 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                   ],
                 ),
               ),
-            // Activities List
+            // Activities list with pull-to-refresh
             Expanded(
               child: _filteredActivities.isEmpty
-                  ? _buildEmptyState()
+                  ? _buildEmptyState() // Show empty state message
                   : RefreshIndicator(
                 color: const Color(0xFFFF8C00),
-                onRefresh: _loadActivities,
+                onRefresh: _refreshActivities, // Refresh activities on pull
                 child: ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: _filteredActivities.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final activity = _filteredActivities[index];
+                    // Staggered animation for list items
                     return AnimatedContainer(
                       duration: Duration(milliseconds: 200 + (index * 50)),
                       curve: Curves.easeInOut,
@@ -291,79 +392,38 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildErrorState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Failed to load activities',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _errorMessage ?? 'Unknown error occurred',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadActivities,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF8C00),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
+  /// Builds the empty state UI when no activities match the current filter/search
+  /// Shows context-appropriate message based on filter and search state
   Widget _buildEmptyState() {
     String message;
     String subtitle;
     IconData icon;
 
+    // Determine appropriate message based on context
     if (_searchQuery.isNotEmpty) {
+      // Empty state for search with no results
       message = 'No results found';
       subtitle = 'Try adjusting your search terms';
       icon = Icons.search_off;
     } else {
+      // Empty state based on selected filter
       switch (_selectedFilterIndex) {
-        case 1:
+        case 1: // Upcoming filter
           message = 'No upcoming activities';
           subtitle = 'Book a service to see upcoming activities';
           icon = Icons.schedule;
           break;
-        case 2:
+        case 2: // Completed filter
           message = 'No completed activities';
           subtitle = 'Your completed services will appear here';
           icon = Icons.check_circle_outline;
           break;
-        case 3:
+        case 3: // Cancelled filter
           message = 'No cancelled activities';
           subtitle = 'Cancelled services will be shown here';
           icon = Icons.cancel_outlined;
           break;
-        default:
+        default: // All filter
           message = 'No activities yet';
           subtitle = 'Start using our services to see your activity history';
           icon = Icons.history;
@@ -402,27 +462,65 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
     );
   }
 
+  /// Shows a modal bottom sheet with detailed activity information
+  /// Displays full details and action buttons (cancel/rate)
   void _showActivityDetails(ActivityItemData activity) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => ActivityDetailsSheet(activity: activity),
+      builder: (context) => ActivityDetailsSheet(
+        activity: activity,
+        // Provide a callback so the sheet can request cancellation with an optional comment
+        onCancel: (String? comment) {
+          setState(() {
+            final idx = _allActivities.indexWhere((a) => a.id == activity.id);
+            if (idx != -1) {
+              // Update the activity status to cancelled and store the comment
+              _allActivities[idx].status = ActivityStatus.cancelled;
+              _allActivities[idx].comments = comment;
+            }
+          });
+
+          // Show confirmation to the user
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Booking cancelled'),
+            duration: const Duration(seconds: 2),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () {
+                // Simple undo: set back to upcoming and clear comment
+                setState(() {
+                  final idx = _allActivities.indexWhere((a) => a.id == activity.id);
+                  if (idx != -1) {
+                    _allActivities[idx].status = ActivityStatus.upcoming;
+                    _allActivities[idx].comments = null;
+                  }
+                });
+              },
+            ),
+          ));
+        },
+      ),
     );
   }
 }
 
+/// Enum representing the possible statuses of an activity
 enum ActivityStatus { upcoming, completed, cancelled }
 
+/// Model class representing an activity item
+/// Contains all information about a service booking
 class ActivityItemData {
-  final String id;
-  final String serviceName;
-  final String date;
-  final ActivityStatus status;
-  final String price;
-  final double? rating;
-  final String description;
-  final String serviceProvider;
+  final String id; // Unique identifier
+  final String serviceName; // Name of the service (e.g., "Tow Service")
+  final String date; // Date and time of service
+  ActivityStatus status; // Current status of the activity (now mutable so we can update it)
+  final String price; // Price of the service
+  final double? rating; // User rating (nullable, may not be rated yet)
+  final String description; // Detailed description of the service
+  final String serviceProvider; // Name of the service provider
+  String? comments; // Optional comments or cancellation reason
 
   ActivityItemData({
     required this.id,
@@ -433,52 +531,10 @@ class ActivityItemData {
     this.rating,
     required this.description,
     required this.serviceProvider,
+    this.comments,
   });
 
-  // Factory constructor for JSON parsing - updated to handle both string and enum status
-  factory ActivityItemData.fromJson(Map<String, dynamic> json) {
-    return ActivityItemData(
-      id: json['id']?.toString() ?? '',
-      serviceName: json['serviceName'] ?? '',
-      date: json['date'] ?? '',
-      status: _statusFromString(json['status'] ?? 'upcoming'),
-      price: json['price'] ?? '',
-      rating: (json['rating'] != null)
-          ? double.tryParse(json['rating'].toString())
-          : null,
-      description: json['description'] ?? '',
-      serviceProvider: json['serviceProvider'] ?? '',
-    );
-  }
-
-  // Helper method to convert string to ActivityStatus
-  static ActivityStatus _statusFromString(String status) {
-    switch (status.toLowerCase()) {
-      case 'upcoming':
-        return ActivityStatus.upcoming;
-      case 'completed':
-        return ActivityStatus.completed;
-      case 'cancelled':
-        return ActivityStatus.cancelled;
-      default:
-        return ActivityStatus.upcoming;
-    }
-  }
-
-  // Convert to JSON (optional, for future use)
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'serviceName': serviceName,
-      'date': date,
-      'status': status.toString().split('.').last,
-      'price': price,
-      'rating': rating,
-      'description': description,
-      'serviceProvider': serviceProvider,
-    };
-  }
-
+  /// Returns human-readable status text
   String get statusText {
     switch (status) {
       case ActivityStatus.upcoming:
@@ -490,6 +546,8 @@ class ActivityItemData {
     }
   }
 
+  /// Returns appropriate color for each status
+  /// Used for status badges and indicators
   Color get statusColor {
     switch (status) {
       case ActivityStatus.upcoming:
@@ -502,9 +560,11 @@ class ActivityItemData {
   }
 }
 
+/// Widget that displays an enhanced activity item card
+/// Shows service info, status, date, rating, and price
 class EnhancedActivityItem extends StatelessWidget {
   final ActivityItemData data;
-  final VoidCallback? onTap;
+  final VoidCallback? onTap; // Callback when card is tapped
 
   const EnhancedActivityItem({
     super.key,
@@ -526,8 +586,10 @@ class EnhancedActivityItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header row with icon, service name, and status badge
               Row(
                 children: [
+                  // Service icon with background
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -541,6 +603,7 @@ class EnhancedActivityItem extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Service name and provider
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -562,6 +625,7 @@ class EnhancedActivityItem extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // Status badge with colored background
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
@@ -580,6 +644,7 @@ class EnhancedActivityItem extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
+              // Service description
               Text(
                 data.description,
                 style: TextStyle(
@@ -588,8 +653,10 @@ class EnhancedActivityItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              // Footer row with date, rating, and price
               Row(
                 children: [
+                  // Date/time icon and text
                   Icon(
                     Icons.access_time,
                     size: 16,
@@ -604,6 +671,7 @@ class EnhancedActivityItem extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
+                  // Rating (only shown if available)
                   if (data.rating != null) ...[
                     Icon(
                       Icons.star,
@@ -620,6 +688,7 @@ class EnhancedActivityItem extends StatelessWidget {
                     ),
                     const SizedBox(width: 16),
                   ],
+                  // Price in brand color
                   Text(
                     data.price,
                     style: const TextStyle(
@@ -637,6 +706,8 @@ class EnhancedActivityItem extends StatelessWidget {
     );
   }
 
+  /// Returns appropriate icon based on service name
+  /// Maps service types to Material icons
   IconData _getServiceIcon(String serviceName) {
     switch (serviceName.toLowerCase()) {
       case 'tow service':
@@ -670,15 +741,18 @@ class EnhancedActivityItem extends StatelessWidget {
       case 'lockout service':
         return Icons.lock_open;
       default:
-        return Icons.car_repair;
+        return Icons.car_repair; // Default icon for unknown services
     }
   }
 }
 
+/// Modal bottom sheet that displays detailed activity information
+/// Shows all activity details and provides action buttons
 class ActivityDetailsSheet extends StatelessWidget {
   final ActivityItemData activity;
+  final void Function(String? comment)? onCancel; // Callback invoked when user cancels booking
 
-  const ActivityDetailsSheet({super.key, required this.activity});
+  const ActivityDetailsSheet({super.key, required this.activity, this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -690,6 +764,7 @@ class ActivityDetailsSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Drag handle at the top
           Container(
             width: 40,
             height: 4,
@@ -704,6 +779,7 @@ class ActivityDetailsSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Service name header
                 Text(
                   activity.serviceName,
                   style: const TextStyle(
@@ -712,6 +788,7 @@ class ActivityDetailsSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
+                // Service provider name
                 Text(
                   activity.serviceProvider,
                   style: TextStyle(
@@ -720,6 +797,7 @@ class ActivityDetailsSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Activity details in rows
                 _buildDetailRow('ID', activity.id),
                 _buildDetailRow('Description', activity.description),
                 _buildDetailRow('Date & Time', activity.date),
@@ -727,14 +805,56 @@ class ActivityDetailsSheet extends StatelessWidget {
                 _buildDetailRow('Price', activity.price),
                 if (activity.rating != null)
                   _buildDetailRow('Rating', '${activity.rating} ⭐'),
+                // Show comments if present
+                _buildDetailRow('Comments', activity.comments ?? '-'),
                 const SizedBox(height: 20),
+                // Action buttons based on activity status
+                // Cancel button for upcoming activities
                 if (activity.status == ActivityStatus.upcoming)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // Add cancel/modify functionality
+                      onPressed: () async {
+                        // Capture navigator and callback before awaiting to avoid using `context` across
+                        // an async gap (fixes `use_build_context_synchronously` lint).
+                        final NavigatorState navigator = Navigator.of(context);
+                        final cancelCallback = onCancel;
+
+                        // Ask user for an optional cancellation comment before proceeding
+                        String? comment = await showDialog<String?>(
+                          context: context,
+                          builder: (dialogContext) {
+                            final TextEditingController commentController = TextEditingController();
+                            return AlertDialog(
+                              title: const Text('Cancel Booking'),
+                              content: TextField(
+                                controller: commentController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Optional comment / reason',
+                                ),
+                                maxLines: 3,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(dialogContext).pop(null),
+                                  child: const Text('Dismiss'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(dialogContext).pop(commentController.text.trim().isEmpty ? null : commentController.text.trim()),
+                                  child: const Text('Confirm'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        // Invoke callback to notify parent to update the activity (even if comment is null)
+                        if (cancelCallback != null) {
+                          cancelCallback(comment);
+                        }
+
+                        // Close the bottom sheet after cancellation using captured navigator
+                        navigator.pop();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
@@ -747,13 +867,14 @@ class ActivityDetailsSheet extends StatelessWidget {
                       child: const Text('Cancel Booking'),
                     ),
                   ),
+                // Rate button for completed activities without rating
                 if (activity.status == ActivityStatus.completed && activity.rating == null)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        // Add rating functionality
+                        // TODO: Add rating functionality
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF8C00),
@@ -774,12 +895,15 @@ class ActivityDetailsSheet extends StatelessWidget {
     );
   }
 
+  /// Helper method to build a detail row with label and value
+  /// Used for displaying activity information in a consistent format
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Label with fixed width for alignment
           SizedBox(
             width: 80,
             child: Text(
@@ -791,6 +915,7 @@ class ActivityDetailsSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
+          // Value that can expand to fill space
           Expanded(
             child: Text(
               value,
@@ -805,3 +930,4 @@ class ActivityDetailsSheet extends StatelessWidget {
     );
   }
 }
+

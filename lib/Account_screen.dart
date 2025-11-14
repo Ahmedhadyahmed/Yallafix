@@ -4,9 +4,47 @@ import 'car_info_page.dart';
 import 'setting.dart';
 import 'msg_screens.dart';
 import 'T_S.dart';
+import 'firebase_auth_service.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  final FirebaseAuthService _authService = FirebaseAuthService();
+  String? _displayName;
+  String? _email;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    try {
+      final userData = await _authService.getCurrentUserData();
+      final firebaseUser = _authService.currentUser;
+
+      setState(() {
+        _displayName = userData?.name ?? firebaseUser?.displayName ?? 'Guest User';
+        _email = userData?.email ?? firebaseUser?.email ?? '';
+        _loading = false;
+      });
+    } catch (e) {
+      // Fallback to Firebase user or default
+      final firebaseUser = _authService.currentUser;
+      setState(() {
+        _displayName = firebaseUser?.displayName ?? 'Guest User';
+        _email = firebaseUser?.email ?? '';
+        _loading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,15 +152,22 @@ class AccountPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "AHMED HASSAN",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                    color: Color(0xFF2C3E50),
-                                  ),
-                                ),
+                                // Display the account name from Firestore / Auth
+                                _loading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : Text(
+                                        _displayName ?? 'Guest User',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                          color: Color(0xFF2C3E50),
+                                        ),
+                                      ),
                                 const SizedBox(height: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(

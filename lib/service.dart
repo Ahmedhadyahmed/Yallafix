@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'Map_Screen.dart';
@@ -19,13 +18,118 @@ class _ServicesPageState extends State<ServicesPage> {
   // Payment method state
   String _selectedPaymentMethod = 'cash'; // Default payment method
 
-  // Updated API Configuration with your mock API endpoints
-  static const String baseUrl = 'https://mock-api.net/api/task-two';
+  // Constant data instead of API calls
+  static const List<String> constantCategories = [
+    'All',
+    'Towing',
+    'Maintenance',
+    'Emergency',
+    'Repair'
+  ];
 
-  // State management for API data
-  List<String> categories = ['All']; // Start with 'All', will be populated from API
+  static final List<Map<String, dynamic>> constantServices = [
+    {
+      'id': '1',
+      'title': 'Tow Truck',
+      'icon': 'local_shipping_rounded',
+      'color': '#2196F3',
+      'eta': '15-20 mins',
+      'rating': 4.8,
+      'price': '\$50-80',
+      'isNew': false,
+      'description': 'Professional towing service',
+      'category': 'Towing'
+    },
+    {
+      'id': '2',
+      'title': 'Mechanic',
+      'icon': 'build_rounded',
+      'color': '#FF5722',
+      'eta': '20-30 mins',
+      'rating': 4.7,
+      'price': '\$60-100',
+      'isNew': true,
+      'description': 'Expert mechanical repairs',
+      'category': 'Repair'
+    },
+    {
+      'id': '3',
+      'title': 'Oil Change',
+      'icon': 'settings_rounded',
+      'color': '#4CAF50',
+      'eta': '25-35 mins',
+      'rating': 4.9,
+      'price': '\$30-50',
+      'isNew': false,
+      'description': 'Quick oil change service',
+      'category': 'Maintenance'
+    },
+    {
+      'id': '4',
+      'title': 'Battery Jump',
+      'icon': 'battery_charging_full_rounded',
+      'color': '#FFC107',
+      'eta': '10-15 mins',
+      'rating': 4.6,
+      'price': '\$25-40',
+      'isNew': false,
+      'description': 'Emergency battery jump start',
+      'category': 'Emergency'
+    },
+    {
+      'id': '5',
+      'title': 'Tire Change',
+      'icon': 'tire_repair_rounded',
+      'color': '#9C27B0',
+      'eta': '15-25 mins',
+      'rating': 4.8,
+      'price': '\$35-60',
+      'isNew': true,
+      'description': 'Flat tire replacement',
+      'category': 'Emergency'
+    },
+    {
+      'id': '6',
+      'title': 'Fuel Delivery',
+      'icon': 'local_gas_station_rounded',
+      'color': '#FF9800',
+      'eta': '20-30 mins',
+      'rating': 4.7,
+      'price': '\$20-35',
+      'isNew': false,
+      'description': 'Emergency fuel delivery',
+      'category': 'Emergency'
+    },
+    {
+      'id': '7',
+      'title': 'Diagnostic',
+      'icon': 'search_rounded',
+      'color': '#00BCD4',
+      'eta': '30-45 mins',
+      'rating': 4.9,
+      'price': '\EGP40-70',
+      'isNew': false,
+      'description': 'Complete vehicle diagnostic',
+      'category': 'Maintenance'
+    },
+    {
+      'id': '8',
+      'title': 'Lockout Service',
+      'icon': 'key_rounded',
+      'color': '#E91E63',
+      'eta': '15-20 mins',
+      'rating': 4.5,
+      'price': '\EGP30-50',
+      'isNew': true,
+      'description': 'Car lockout assistance',
+      'category': 'Emergency'
+    },
+  ];
+
+  // State management for data
+  List<String> categories = [];
   List<ServiceItem> allServices = [];
-  bool isLoading = true;
+  bool isLoading = false;
   String? errorMessage;
 
   List<ServiceItem> get filteredServices {
@@ -58,7 +162,7 @@ class _ServicesPageState extends State<ServicesPage> {
     _loadData();
   }
 
-  // Load data from API
+  // Load data from constants
   Future<void> _loadData() async {
     try {
       setState(() {
@@ -66,18 +170,14 @@ class _ServicesPageState extends State<ServicesPage> {
         errorMessage = null;
       });
 
-      // Load both services and categories
-      final results = await Future.wait([
-        _fetchServices(),
-        _fetchCategories(),
-      ]);
+      // Simulate a small delay to show loading state
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Load constant data
+      categories = List.from(constantCategories);
+      allServices = constantServices.map((json) => ServiceItem.fromJson(json)).toList();
 
       setState(() {
-        allServices = results[0] as List<ServiceItem>;
-        final apiCategories = results[1] as List<String>;
-        // Remove 'All' from API categories if it exists and add it manually at the beginning
-        final filteredCategories = apiCategories.where((cat) => cat != 'All').toList();
-        categories = ['All', ...filteredCategories];
         isLoading = false;
       });
     } catch (e) {
@@ -85,44 +185,6 @@ class _ServicesPageState extends State<ServicesPage> {
         errorMessage = 'Failed to load data: ${e.toString()}';
         isLoading = false;
       });
-    }
-  }
-
-  // Fetch services from API
-  Future<List<ServiceItem>> _fetchServices() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/services'),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((json) => ServiceItem.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load services: HTTP ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
-
-  // Fetch categories from API
-  Future<List<String>> _fetchCategories() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/categories'),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((item) => item['name'] as String).toList();
-      } else {
-        throw Exception('Failed to load categories: HTTP ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
     }
   }
 
@@ -510,56 +572,6 @@ class _ServicesPageState extends State<ServicesPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Handle service booking confirmation
-  void _confirmServiceBooking(ServiceItem service) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Booking'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              service.icon,
-              size: 48,
-              color: service.color,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Book ${service.title}?',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text('Price: ${service.price}'),
-            Text('ETA: ${service.eta}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _processBooking(service, null, 'cash');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF8C00),
-            ),
-            child: Text(
-              'Confirm',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
       ),
     );
   }
