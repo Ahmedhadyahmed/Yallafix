@@ -15,34 +15,77 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   final FirebaseAuthService _authService = FirebaseAuthService();
+
+  // User data variables
   String? _displayName;
   String? _email;
+  String? _phoneNumber;
+  String? _photoUrl;
+  String? _userId;
+  DateTime? _memberSince;
+  int _totalServices = 0;
+  int _totalHistory = 0;
+  double _rating = 0.0;
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUser();
+    _loadUserData();
   }
 
-  Future<void> _loadUser() async {
+  Future<void> _loadUserData() async {
     try {
       final userData = await _authService.getCurrentUserData();
       final firebaseUser = _authService.currentUser;
 
       setState(() {
+        // Basic user info from UserModel and Firebase Auth
         _displayName = userData?.name ?? firebaseUser?.displayName ?? 'Guest User';
         _email = userData?.email ?? firebaseUser?.email ?? '';
+        _phoneNumber = firebaseUser?.phoneNumber ?? '';
+        _photoUrl = firebaseUser?.photoURL;
+        _userId = firebaseUser?.uid ?? '';
+
+        // Member since from Firebase Auth creation time
+        _memberSince = firebaseUser?.metadata.creationTime;
+
+        // Default stats (you can fetch these from a separate Firestore collection later)
+        _totalServices = 12;
+        _totalHistory = 8;
+        _rating = 5.0;
+
         _loading = false;
       });
     } catch (e) {
-      // Fallback to Firebase user or default
+      // Fallback to Firebase Auth user data only
       final firebaseUser = _authService.currentUser;
       setState(() {
         _displayName = firebaseUser?.displayName ?? 'Guest User';
         _email = firebaseUser?.email ?? '';
+        _phoneNumber = firebaseUser?.phoneNumber ?? '';
+        _photoUrl = firebaseUser?.photoURL;
+        _userId = firebaseUser?.uid ?? '';
+        _memberSince = firebaseUser?.metadata.creationTime;
+        _totalServices = 0;
+        _totalHistory = 0;
+        _rating = 5.0;
         _loading = false;
       });
+    }
+  }
+
+  String _formatMemberSince() {
+    if (_memberSince == null) return 'N/A';
+    final now = DateTime.now();
+    final difference = now.difference(_memberSince!);
+
+    if (difference.inDays < 30) {
+      return 'Member for ${difference.inDays} days';
+    } else if (difference.inDays < 365) {
+      return 'Member for ${(difference.inDays / 30).floor()} months';
+    } else {
+      return 'Member for ${(difference.inDays / 365).floor()} years';
     }
   }
 
@@ -119,99 +162,157 @@ class _AccountPageState extends State<AccountPage> {
                           ),
                         ],
                       ),
-                      child: Row(
+                      child: Column(
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xFFFF9800).withOpacity(0.3),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: CircleAvatar(
-                              radius: 45,
-                              backgroundColor: Colors.transparent,
-                              child: const Icon(
-                                Icons.person_rounded,
-                                size: 50,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Display the account name from Firestore / Auth
-                                _loading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      )
-                                    : Text(
-                                        _displayName ?? 'Guest User',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
-                                          color: Color(0xFF2C3E50),
-                                        ),
-                                      ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color(0xFFFF9800).withOpacity(0.15),
-                                        Color(0xFFFFB74D).withOpacity(0.15),
-                                      ],
+                          Row(
+                            children: [
+                              // Profile Picture
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: _photoUrl == null
+                                      ? LinearGradient(
+                                    colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                      : null,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xFFFF9800).withOpacity(0.3),
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 5),
                                     ),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(
-                                        Icons.star_rounded,
-                                        size: 18,
-                                        color: Color(0xFFFF9800),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "5.0",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFFF9800),
-                                        ),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "Rating",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Color(0xFFFF9800),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
+                                child: CircleAvatar(
+                                  radius: 45,
+                                  backgroundColor: Colors.transparent,
+                                  backgroundImage: _photoUrl != null
+                                      ? NetworkImage(_photoUrl!)
+                                      : null,
+                                  child: _photoUrl == null
+                                      ? const Icon(
+                                    Icons.person_rounded,
+                                    size: 50,
+                                    color: Colors.white,
+                                  )
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Display Name
+                                    _loading
+                                        ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                        : Text(
+                                      _displayName ?? 'Guest User',
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                        color: Color(0xFF2C3E50),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Rating Badge
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Color(0xFFFF9800).withOpacity(0.15),
+                                            Color(0xFFFFB74D).withOpacity(0.15),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.star_rounded,
+                                            size: 18,
+                                            color: Color(0xFFFF9800),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            _rating.toStringAsFixed(1),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFFF9800),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Text(
+                                            "Rating",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFFFF9800),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // User Information Details
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F9FA),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              children: [
+                                if (_email != null && _email!.isNotEmpty)
+                                  _buildInfoRow(
+                                    Icons.email_rounded,
+                                    'Email',
+                                    _email!,
+                                  ),
+                                if (_phoneNumber != null && _phoneNumber!.isNotEmpty) ...[
+                                  const SizedBox(height: 12),
+                                  _buildInfoRow(
+                                    Icons.phone_rounded,
+                                    'Phone',
+                                    _phoneNumber!,
+                                  ),
+                                ],
+                                if (_userId != null && _userId!.isNotEmpty) ...[
+                                  const SizedBox(height: 12),
+                                  _buildInfoRow(
+                                    Icons.badge_rounded,
+                                    'User ID',
+                                    _userId!.substring(0, 8) + '...',
+                                  ),
+                                ],
+                                if (_memberSince != null) ...[
+                                  const SizedBox(height: 12),
+                                  _buildInfoRow(
+                                    Icons.calendar_today_rounded,
+                                    'Member Since',
+                                    _formatMemberSince(),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -235,7 +336,7 @@ class _AccountPageState extends State<AccountPage> {
                       child: _buildStatCard(
                         icon: Icons.car_repair_rounded,
                         label: 'Services',
-                        value: '12',
+                        value: _totalServices.toString(),
                         colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
                       ),
                     ),
@@ -244,7 +345,7 @@ class _AccountPageState extends State<AccountPage> {
                       child: _buildStatCard(
                         icon: Icons.history_rounded,
                         label: 'History',
-                        value: '8',
+                        value: _totalHistory.toString(),
                         colors: [Color(0xFFFFB74D), Color(0xFFFFCC80)],
                       ),
                     ),
@@ -341,6 +442,44 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: const Color(0xFFFF9800),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF2C3E50),
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

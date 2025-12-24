@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.example.yala_fix"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34  // ✅ Updated for better Firebase compatibility
 
     // ✅ Force NDK 27 (required by Firebase plugins)
     ndkVersion = "27.0.12077973"
@@ -27,9 +27,12 @@ android {
     defaultConfig {
         applicationId = "com.example.yala_fix"
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34  // ✅ Updated to match compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // ✅ Enable multidex (required for Firebase/Firestore)
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -41,4 +44,17 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// ✅ Add Firebase dependencies
+dependencies {
+    // Firebase BoM (Bill of Materials) - manages versions automatically
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+
+    // Firebase products (versions managed by BoM)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
+    // Multidex support
+    implementation("androidx.multidex:multidex:2.0.1")
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:your_app_name/personal_info.dart';
 import 'Login.dart';
 import 'Privacy_&_Security.dart';
+import 'ProfileInfoScreen.dart';
 import 'feed_back.dart';
 import 'help_center_screen.dart';
 

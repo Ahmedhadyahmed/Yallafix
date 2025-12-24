@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:intl/intl.dart';
 // Import your map screen
 import 'Map_Screen.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,9 +15,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _animationController;
+  late AnimationController _notificationController;
   late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
   late PageController _pageController;
   late Timer _timer;
+
+  StreamSubscription<InternetConnectionStatus>? _connectivitySubscription;
+  bool _isConnected = true;
+  bool _showNotification = false;
+  String _userName = '';
+  String _loginTime = '';
 
   String? selectedService;
   int _currentPromoIndex = 0;
@@ -98,6 +108,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       vsync: this,
     );
 
+    _notificationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
     _pageController = PageController();
 
     _fadeAnimation = Tween<double>(
@@ -108,7 +123,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       curve: Curves.easeOut,
     ));
 
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _notificationController,
+      curve: Curves.easeOut,
+    ));
+
     _animationController.forward();
+
+    // Initialize connectivity and Firebase checks
+    _initializeConnectivityAndUser();
 
     // Auto-scroll promo cards every 4 seconds
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
@@ -123,11 +149,60 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
+  Future<void> _initializeConnectivityAndUser() async {
+    // Check initial connectivity
+    _isConnected = await InternetConnectionChecker().hasConnection;
+
+    // Listen to connectivity changes
+    _connectivitySubscription = InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+      setState(() {
+        _isConnected = status == InternetConnectionStatus.connected;
+      });
+    });
+
+    // Check if user is logged in and internet is available
+    if (_isConnected) {
+      _checkUserAndShowNotification();
+    }
+  }
+
+  void _checkUserAndShowNotification() {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      setState(() {
+        // Get user's display name or email
+        _userName = user.displayName ?? user.email?.split('@')[0] ?? 'User';
+        // Format current time
+        _loginTime = DateFormat('hh:mm a').format(DateTime.now());
+        _showNotification = true;
+      });
+
+      // Show notification animation
+      _notificationController.forward();
+
+      // Auto-hide notification after 5 seconds
+      Future.delayed(const Duration(seconds: 5), () {
+        if (mounted) {
+          _notificationController.reverse().then((_) {
+            if (mounted) {
+              setState(() {
+                _showNotification = false;
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
+    _notificationController.dispose();
     _pageController.dispose();
     _timer.cancel();
+    _connectivitySubscription?.cancel();
     super.dispose();
   }
 
@@ -158,23 +233,110 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              _buildSearchSection(),
-              const SizedBox(height: 30),
-              _buildRecentLocations(),
-              const SizedBox(height: 40),
-              _buildServicesSection(),
-              const SizedBox(height: 30),
-              _buildPromoSection(),
-              const SizedBox(height: 100),
-            ],
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildSearchSection(),
+                  const SizedBox(height: 30),
+                  _buildRecentLocations(),
+                  const SizedBox(height: 40),
+                  _buildServicesSection(),
+                  const SizedBox(height: 30),
+                  _buildPromoSection(),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
           ),
+          // Notification bar
+          if (_showNotification && _isConnected)
+            _buildNotificationBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationBar() {
+    return SlideTransition(
+      position: _slideAnimation,
+      child: Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_circle,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Welcome back, $_userName!',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Logged in at $_loginTime',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white, size: 20),
+              onPressed: () {
+                _notificationController.reverse().then((_) {
+                  if (mounted) {
+                    setState(() {
+                      _showNotification = false;
+                    });
+                  }
+                });
+              },
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
         ),
       ),
     );
@@ -184,13 +346,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GestureDetector(
-        onTap: _navigateToMap, // Navigate to map when tapped
+        onTap: _navigateToMap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             color: Colors.grey[100],
             borderRadius: BorderRadius.circular(50),
-            // Add subtle shadow to indicate it's clickable
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -259,7 +420,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: _navigateToMap, // Also navigate to map when recent location is tapped
+              onTap: _navigateToMap,
               borderRadius: BorderRadius.circular(12),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
@@ -377,7 +538,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               setState(() {
                 selectedService = service.id;
               });
-              // Navigate to map with service-specific title
               MapNavigation.navigateToMap(
                 context,
                 title: '${service.title} Service Location',
@@ -522,7 +682,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 16),
                           GestureDetector(
-                            onTap: _navigateToMap, // Navigate to map from promo button
+                            onTap: _navigateToMap,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(

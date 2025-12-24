@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'Map_Screen.dart';
+import 'activity_manager.dart'; // NEW IMPORT
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({super.key});
@@ -580,6 +581,25 @@ class _ServicesPageState extends State<ServicesPage> {
   void _processBooking(ServiceItem service, String? location, String paymentMethod) {
     String paymentMethodText = _getPaymentMethodDisplayText(paymentMethod);
 
+    // Create new activity from the booking
+    final activityManager = ActivityManager();
+    final newActivity = ActivityItemData(
+      id: activityManager.generateId(),
+      serviceName: service.title,
+      date: _formatBookingDate(),
+      status: ActivityStatus.upcoming,
+      price: service.price,
+      rating: null,
+      description: service.description,
+      serviceProvider: 'Quick Service Pro', // You can customize this
+      comments: null,
+      location: location,
+      paymentMethod: paymentMethodText,
+    );
+
+    // Add to activity manager
+    activityManager.addActivity(newActivity);
+
     String message = '${service.title} booked successfully!\nWe\'ll be there in ${service.eta}\nPayment: $paymentMethodText';
     if (location != null) {
       String shortLocation = location.length > 40 ? '${location.substring(0, 40)}...' : location;
@@ -628,6 +648,15 @@ class _ServicesPageState extends State<ServicesPage> {
         ),
       ),
     );
+  }
+
+  // Helper method to format the booking date
+  String _formatBookingDate() {
+    final now = DateTime.now();
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final period = now.hour >= 12 ? 'PM' : 'AM';
+    return '${months[now.month - 1]} ${now.day}, ${now.year} - $timeStr $period';
   }
 
   String _getPaymentMethodDisplayText(String paymentMethod) {

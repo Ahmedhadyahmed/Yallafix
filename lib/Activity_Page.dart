@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'activity_manager.dart'; // NEW IMPORT
 
 /// ActivityPage displays the user's service activity history
 /// Shows upcoming, completed, and cancelled services with filtering and search capabilities
@@ -27,8 +28,8 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
 
-  // Activity data with mock content
-  late List<ActivityItemData> _allActivities;
+  // Activity data
+  List<ActivityItemData> _allActivities = [];
 
   @override
   void initState() {
@@ -49,11 +50,33 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
       curve: Curves.easeInOut,
     ));
 
-    // Load mock activities
-    _allActivities = _getMockActivities();
+    // Load activities from ActivityManager
+    _loadActivitiesFromManager();
+
+    // Listen for activity changes
+    ActivityManager().addListener(_onActivitiesChanged);
 
     // Start fade-in animation
     _animationController.forward();
+  }
+
+  // Load activities from ActivityManager
+  void _loadActivitiesFromManager() {
+    final managerActivities = ActivityManager().activities;
+
+    // If manager has activities, use them; otherwise use mock data
+    if (managerActivities.isEmpty) {
+      _allActivities = _getMockActivities();
+    } else {
+      _allActivities = List.from(managerActivities);
+    }
+  }
+
+  // Called when activities change in ActivityManager
+  void _onActivitiesChanged() {
+    setState(() {
+      _allActivities = List.from(ActivityManager().activities);
+    });
   }
 
   /// Returns a list of mock activities for testing
@@ -68,7 +91,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
         rating: null,
         description: 'Vehicle towing from downtown to repair shop',
         serviceProvider: 'Quick Tow Services',
-        comments: null, // no comments yet
+        comments: null,
       ),
       ActivityItemData(
         id: '2',
@@ -92,83 +115,6 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
         serviceProvider: 'Mobile Auto Experts',
         comments: null,
       ),
-      ActivityItemData(
-        id: '4',
-        serviceName: 'Oil Change',
-        date: 'Nov 5, 2025 - 11:00 AM',
-        status: ActivityStatus.cancelled,
-        price: '\$45.00',
-        rating: null,
-        description: 'Synthetic oil change and filter replacement',
-        serviceProvider: 'Express Lube',
-        comments: 'User cancelled due to schedule conflict',
-      ),
-      ActivityItemData(
-        id: '5',
-        serviceName: 'Tire Service',
-        date: 'Nov 20, 2025 - 3:00 PM',
-        status: ActivityStatus.upcoming,
-        price: '\$200.00',
-        rating: null,
-        description: 'Four tire rotation and balance',
-        serviceProvider: 'Tire World',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '6',
-        serviceName: 'Brake Service',
-        date: 'Oct 28, 2025 - 1:00 PM',
-        status: ActivityStatus.completed,
-        price: '\$320.00',
-        rating: 4.8,
-        description: 'Front brake pad replacement and rotor resurfacing',
-        serviceProvider: 'Brake Masters',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '7',
-        serviceName: 'Car Wash',
-        date: 'Nov 12, 2025 - 4:00 PM',
-        status: ActivityStatus.completed,
-        price: '\$25.00',
-        rating: null,
-        description: 'Premium wash and interior cleaning',
-        serviceProvider: 'Shine Auto Spa',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '8',
-        serviceName: 'AC Service',
-        date: 'Nov 18, 2025 - 10:30 AM',
-        status: ActivityStatus.upcoming,
-        price: '\$95.00',
-        rating: null,
-        description: 'Air conditioning recharge and system inspection',
-        serviceProvider: 'Cool Ride Services',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '9',
-        serviceName: 'Jump Start',
-        date: 'Oct 30, 2025 - 8:45 AM',
-        status: ActivityStatus.completed,
-        price: '\$40.00',
-        rating: 4.2,
-        description: 'Emergency jump start service',
-        serviceProvider: 'Roadside Heroes',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '10',
-        serviceName: 'Windshield Repair',
-        date: 'Nov 3, 2025 - 2:00 PM',
-        status: ActivityStatus.cancelled,
-        price: '\$75.00',
-        rating: null,
-        description: 'Small chip repair on front windshield',
-        serviceProvider: 'Glass Fix Pro',
-        comments: 'Provider could not service on the requested date',
-      ),
     ];
   }
 
@@ -177,6 +123,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
     // Clean up resources to prevent memory leaks
     _animationController.dispose();
     _searchController.dispose();
+    ActivityManager().removeListener(_onActivitiesChanged);
     super.dispose();
   }
 
@@ -219,7 +166,7 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
   Future<void> _refreshActivities() async {
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
-      // Data is already loaded, just trigger rebuild
+      _loadActivitiesFromManager();
     });
   }
 
@@ -479,6 +426,9 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
               // Update the activity status to cancelled and store the comment
               _allActivities[idx].status = ActivityStatus.cancelled;
               _allActivities[idx].comments = comment;
+
+              // Update in ActivityManager as well
+              ActivityManager().updateActivity(activity.id, _allActivities[idx]);
             }
           });
 
@@ -495,6 +445,9 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
                   if (idx != -1) {
                     _allActivities[idx].status = ActivityStatus.upcoming;
                     _allActivities[idx].comments = null;
+
+                    // Update in ActivityManager
+                    ActivityManager().updateActivity(activity.id, _allActivities[idx]);
                   }
                 });
               },
@@ -503,60 +456,6 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
         },
       ),
     );
-  }
-}
-
-/// Enum representing the possible statuses of an activity
-enum ActivityStatus { upcoming, completed, cancelled }
-
-/// Model class representing an activity item
-/// Contains all information about a service booking
-class ActivityItemData {
-  final String id; // Unique identifier
-  final String serviceName; // Name of the service (e.g., "Tow Service")
-  final String date; // Date and time of service
-  ActivityStatus status; // Current status of the activity (now mutable so we can update it)
-  final String price; // Price of the service
-  final double? rating; // User rating (nullable, may not be rated yet)
-  final String description; // Detailed description of the service
-  final String serviceProvider; // Name of the service provider
-  String? comments; // Optional comments or cancellation reason
-
-  ActivityItemData({
-    required this.id,
-    required this.serviceName,
-    required this.date,
-    required this.status,
-    required this.price,
-    this.rating,
-    required this.description,
-    required this.serviceProvider,
-    this.comments,
-  });
-
-  /// Returns human-readable status text
-  String get statusText {
-    switch (status) {
-      case ActivityStatus.upcoming:
-        return 'Upcoming';
-      case ActivityStatus.completed:
-        return 'Completed';
-      case ActivityStatus.cancelled:
-        return 'Cancelled';
-    }
-  }
-
-  /// Returns appropriate color for each status
-  /// Used for status badges and indicators
-  Color get statusColor {
-    switch (status) {
-      case ActivityStatus.upcoming:
-        return Colors.orange;
-      case ActivityStatus.completed:
-        return Colors.green;
-      case ActivityStatus.cancelled:
-        return Colors.red;
-    }
   }
 }
 
@@ -711,16 +610,20 @@ class EnhancedActivityItem extends StatelessWidget {
   IconData _getServiceIcon(String serviceName) {
     switch (serviceName.toLowerCase()) {
       case 'tow service':
+      case 'tow truck':
         return Icons.local_shipping;
       case 'battery service':
+      case 'battery jump':
         return Icons.battery_charging_full;
       case 'mobile mechanic':
+      case 'mechanic':
         return Icons.build;
       case 'auto parts':
         return Icons.settings;
       case 'oil change':
         return Icons.opacity;
       case 'tire service':
+      case 'tire change':
         return Icons.tire_repair;
       case 'car wash':
         return Icons.local_car_wash;
@@ -735,11 +638,14 @@ class EnhancedActivityItem extends StatelessWidget {
       case 'transmission service':
         return Icons.settings_applications;
       case 'emergency fuel':
+      case 'fuel delivery':
         return Icons.local_gas_station;
       case 'jump start':
         return Icons.flash_on;
       case 'lockout service':
         return Icons.lock_open;
+      case 'diagnostic':
+        return Icons.search;
       default:
         return Icons.car_repair; // Default icon for unknown services
     }
@@ -805,6 +711,10 @@ class ActivityDetailsSheet extends StatelessWidget {
                 _buildDetailRow('Price', activity.price),
                 if (activity.rating != null)
                   _buildDetailRow('Rating', '${activity.rating} ⭐'),
+                if (activity.location != null)
+                  _buildDetailRow('Location', activity.location!),
+                if (activity.paymentMethod != null)
+                  _buildDetailRow('Payment', activity.paymentMethod!),
                 // Show comments if present
                 _buildDetailRow('Comments', activity.comments ?? '-'),
                 const SizedBox(height: 20),
@@ -905,7 +815,7 @@ class ActivityDetailsSheet extends StatelessWidget {
         children: [
           // Label with fixed width for alignment
           SizedBox(
-            width: 80,
+            width: 100,
             child: Text(
               label,
               style: TextStyle(
@@ -930,4 +840,3 @@ class ActivityDetailsSheet extends StatelessWidget {
     );
   }
 }
-

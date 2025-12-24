@@ -10,8 +10,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
-  // Animation controllers - manage the timing and state of each animation
-  late AnimationController _carController;           // Controls car sliding motion
+  // Animation controllers - ma nage the timing and state of each animation
+  late AnimationController _carController;           // Controls motor sliding icon
   late AnimationController _rotationController;      // Controls car rotation (drift effect)
   late AnimationController _smokeController;         // Controls smoke particle effects
   late AnimationController _textController;          // Controls text appearance
@@ -31,8 +31,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
     // Initialize animation controllers with durations
     _carController = AnimationController(
-      duration: const Duration(milliseconds: 1800),
-      vsync: this,
+      duration: const Duration(milliseconds: 1800), //the time of the animation
+      vsync: this, //"Vertical Sync" it's a synchronization mechanism that ties animations to the screen's refresh rate.
     );
 
     _rotationController = AnimationController(
@@ -81,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       ),
     ]).animate(_rotationController);
 
-    // Smoke appears (0.0 to 0.7) then disappears (0.7 to 0.0)
+    // Smoke appears (0.0 to 0.7) then disappears (0.7 to 0.0) [Fade in out effect]
     _smokeFadeAnimation = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween<double>(begin: 0.0, end: 0.7),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// Sign Up screen widget for creating new user accounts with Firebase Authentication
+/// Includes comprehensive form validation and user feedback
 class FirebaseSignUpScreen extends StatefulWidget {
   const FirebaseSignUpScreen({Key? key}) : super(key: key);
 
@@ -9,25 +11,34 @@ class FirebaseSignUpScreen extends StatefulWidget {
 }
 
 class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
+  // ==================== STATE VARIABLES ====================
+  // Toggle variables for password visibility (show/hide password text)
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
+
+  // Loading state for sign-up button
   bool _isLoading = false;
 
-  // Controllers for form fields
+  // ==================== TEXT CONTROLLERS ====================
+  // Controllers to manage text input for all form fields
   final TextEditingController nameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
-  // Error messages
+  // ==================== ERROR MESSAGE VARIABLES ====================
+  // Store validation error messages for each field
+  // null means no error, String means there's an error to display
   String? nameError;
   String? usernameError;
   String? emailError;
   String? passwordError;
   String? confirmPasswordError;
 
-  // List of allowed email domains
+  // ==================== ALLOWED EMAIL DOMAINS ====================
+  // Whitelist of email providers for security and quality control
+  // Only emails from these domains will be accepted during sign-up
   final List<String> allowedEmailDomains = [
     'gmail.com',
     'yahoo.com',
@@ -47,6 +58,8 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     'zoho.com',
   ];
 
+  /// Cleanup method - disposes all controllers when widget is removed
+  /// Prevents memory leaks by releasing resources
   @override
   void dispose() {
     nameController.dispose();
@@ -57,28 +70,81 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     super.dispose();
   }
 
-  // Enhanced email validation function
+  // ==================== EMAIL VALIDATION ====================
+  /// Validates email format and checks against allowed domain list
+  /// Returns true if email is valid and from an allowed provider
   bool isValidEmail(String email) {
+    // Regular expression to validate email format
+    // Pattern: letters/numbers/special chars @ domain . extension
     final RegExp emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
 
+    // First check: Does it match email format?
     if (!emailRegex.hasMatch(email)) {
       return false;
     }
 
-    String domain = email.split('@').last.toLowerCase();
+    // Second check: Is the domain in our allowed list?
+    String domain = email.split('@').last.toLowerCase(); // Extract domain (e.g., "gmail.com")
     return allowedEmailDomains.contains(domain);
   }
 
-  // Password validation function
+  // ==================== ENHANCED PASSWORD VALIDATION ====================
+  /// Validates password strength with multiple criteria
+  /// Returns Map with 'isValid' boolean and 'errors' list
+  Map<String, dynamic> validatePasswordStrength(String password) {
+    List<String> errors = [];
+
+    // Minimum length requirement
+    if (password.length < 8) {
+      errors.add('At least 8 characters');
+    }
+
+    // Maximum length check (prevent extremely long passwords)
+    if (password.length > 64) {
+      errors.add('Maximum 64 characters');
+    }
+
+    // Must contain at least one uppercase letter (A-Z)
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      errors.add('One uppercase letter');
+    }
+
+    // Must contain at least one lowercase letter (a-z)
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      errors.add('One lowercase letter');
+    }
+
+    // Must contain at least one number (0-9)
+    if (!RegExp(r'[0-9]').hasMatch(password)) {
+      errors.add('One number');
+    }
+
+    // Must contain at least one special character
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
+      errors.add('One special character (!@#\$%^&*)');
+    }
+
+    return {
+      'isValid': errors.isEmpty,
+      'errors': errors,
+    };
+  }
+
+  /// Simple password validation (minimum length only)
+  /// Used as fallback for basic validation
   bool isValidPassword(String password) {
     return password.length >= 6;
   }
 
-  // Form validation function
+  // ==================== FORM VALIDATION ====================
+  /// Validates all form fields and updates error messages
+  /// Returns true if all fields are valid, false otherwise
   bool validateForm() {
     bool isValid = true;
+
+    // Reset all error messages before validation
     setState(() {
       nameError = null;
       usernameError = null;
@@ -86,6 +152,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
       passwordError = null;
       confirmPasswordError = null;
 
+      // ========== NAME VALIDATION ==========
       if (nameController.text.trim().isEmpty) {
         nameError = 'Name is required';
         isValid = false;
@@ -94,6 +161,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         isValid = false;
       }
 
+      // ========== USERNAME VALIDATION ==========
       if (usernameController.text.trim().isEmpty) {
         usernameError = 'Username is required';
         isValid = false;
@@ -105,10 +173,12 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         isValid = false;
       }
 
+      // ========== EMAIL VALIDATION ==========
       if (emailController.text.trim().isEmpty) {
         emailError = 'Email is required';
         isValid = false;
       } else if (!isValidEmail(emailController.text.trim())) {
+        // Check if it's a basic format issue or domain issue
         final RegExp basicEmailRegex = RegExp(
           r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
         );
@@ -120,14 +190,23 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         isValid = false;
       }
 
+      // ========== PASSWORD VALIDATION (ENHANCED) ==========
       if (passwordController.text.isEmpty) {
         passwordError = 'Password is required';
         isValid = false;
-      } else if (!isValidPassword(passwordController.text)) {
-        passwordError = 'Password must be at least 6 characters';
-        isValid = false;
+      } else {
+        // Use enhanced password validation
+        var passwordValidation = validatePasswordStrength(passwordController.text);
+
+        if (!passwordValidation['isValid']) {
+          // Combine all error messages into one string
+          List<String> errors = passwordValidation['errors'];
+          passwordError = 'Password must contain:\n• ${errors.join('\n• ')}';
+          isValid = false;
+        }
       }
 
+      // ========== CONFIRM PASSWORD VALIDATION ==========
       if (confirmPasswordController.text.isEmpty) {
         confirmPasswordError = 'Please confirm your password';
         isValid = false;
@@ -140,52 +219,63 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     return isValid;
   }
 
-  // Navigate back to login screen
+  // ==================== NAVIGATION ====================
+  /// Navigate back to login screen
   void _navigateToLogin() {
     Navigator.of(context).pop();
   }
 
-  // Simple Firebase Auth signup without Firestore
+  // ==================== FIREBASE SIGN UP HANDLER ====================
+  /// Handles user registration with Firebase Authentication
+  /// Creates new user account and updates display name
   Future<void> handleSignUp() async {
+    // Validate form before proceeding
     if (!validateForm()) {
-      return;
+      return; // Exit if validation fails
     }
 
+    // Show loading state
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Direct Firebase Auth signup - no Firestore involved
+      // Create new user account with Firebase Authentication
+      // This communicates with Firebase backend to register the user
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Update display name
+      // Update the user's display name in Firebase Auth profile
+      // This allows us to greet them by name when they log in
       await userCredential.user?.updateDisplayName(nameController.text.trim());
 
+      // Check if widget is still mounted before showing UI elements
       if (mounted) {
-        // Show success message
+        // Show success notification
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Account created successfully! You can now log in.'),
-            backgroundColor: Color(0xFFFF7A00),
+            backgroundColor: Color(0xFFFF7A00), // Orange theme color
             duration: Duration(seconds: 2),
           ),
         );
 
-        // Wait exactly 2 seconds then navigate to login
+        // Wait 2 seconds for user to see the success message
         await Future.delayed(const Duration(seconds: 2));
 
+        // Navigate back to login screen after successful registration
         if (mounted) {
           _navigateToLogin();
         }
       }
     } on FirebaseAuthException catch (e) {
+      // Handle Firebase-specific authentication errors
       if (mounted) {
         String errorMessage;
 
+        // Map Firebase error codes to user-friendly messages
         switch (e.code) {
           case 'email-already-in-use':
             errorMessage = 'This email is already registered. Please use a different email or try logging in.';
@@ -197,9 +287,11 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
             errorMessage = 'Please enter a valid email address.';
             break;
           default:
+          // Fallback for any other Firebase errors
             errorMessage = 'Sign up failed: ${e.message}';
         }
 
+        // Display error dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -209,7 +301,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(); // Close dialog
                   },
                   child: const Text('OK'),
                 ),
@@ -219,6 +311,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         );
       }
     } catch (e) {
+      // Catch any other unexpected errors (network issues, etc.)
       if (mounted) {
         showDialog(
           context: context,
@@ -239,6 +332,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
         );
       }
     } finally {
+      // Always hide loading indicator after sign-up attempt completes
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -247,15 +341,17 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
     }
   }
 
+  // ==================== BUILD UI ====================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      // Prevents keyboard from covering input fields
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Stack(
           children: [
-            // Main content
+            // ==================== MAIN SCROLLABLE CONTENT ====================
             LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
@@ -269,33 +365,34 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                       children: [
                         const SizedBox(height: 30),
 
-                        // Title
+                        // ==================== TITLE ====================
                         const Text(
                           'Sign Up',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFFFF7A00),
+                            color: Color(0xFFFF7A00), // Orange brand color
                             letterSpacing: -0.5,
                           ),
                         ),
 
                         const SizedBox(height: 30),
 
-                        // Name field
+                        // ==================== NAME FIELD ====================
                         const Text(
                           'Name:',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF374151),
+                            color: Color(0xFF374151), // Dark grey label
                           ),
                         ),
                         const SizedBox(height: 8),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE5E7EB),
+                            color: const Color(0xFFE5E7EB), // Light grey background
                             borderRadius: BorderRadius.circular(25),
+                            // Show red border if there's an error
                             border: nameError != null
                                 ? Border.all(color: Colors.red, width: 1)
                                 : null,
@@ -305,11 +402,11 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                             decoration: const InputDecoration(
                               hintText: 'Enter your full name...',
                               hintStyle: TextStyle(
-                                color: Color(0xFF9CA3AF),
+                                color: Color(0xFF9CA3AF), // Grey hint text
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                               ),
-                              border: InputBorder.none,
+                              border: InputBorder.none, // No default border
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 16,
@@ -317,6 +414,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                             ),
                           ),
                         ),
+                        // Display error message below field if validation fails
                         if (nameError != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 5, left: 20),
@@ -331,7 +429,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Username field
+                        // ==================== USERNAME FIELD ====================
                         const Text(
                           'Username:',
                           style: TextStyle(
@@ -380,7 +478,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Email field
+                        // ==================== EMAIL FIELD ====================
                         const Text(
                           'Email:',
                           style: TextStyle(
@@ -400,7 +498,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                           ),
                           child: TextField(
                             controller: emailController,
-                            keyboardType: TextInputType.emailAddress,
+                            keyboardType: TextInputType.emailAddress, // Email keyboard layout
                             decoration: const InputDecoration(
                               hintText: 'Enter your email (Gmail, Yahoo, etc.)...',
                               hintStyle: TextStyle(
@@ -430,7 +528,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Password field
+                        // ==================== PASSWORD FIELD ====================
                         const Text(
                           'Password:',
                           style: TextStyle(
@@ -450,7 +548,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                           ),
                           child: TextField(
                             controller: passwordController,
-                            obscureText: obscurePassword,
+                            obscureText: obscurePassword, // Hide password characters
                             decoration: InputDecoration(
                               hintText: 'Enter your password...',
                               hintStyle: const TextStyle(
@@ -463,6 +561,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                                 horizontal: 20,
                                 vertical: 16,
                               ),
+                              // Toggle button to show/hide password
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -478,6 +577,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                             ),
                           ),
                         ),
+                        // Display password error message (can be multi-line)
                         if (passwordError != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 5, left: 20),
@@ -492,7 +592,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Confirm Password field
+                        // ==================== CONFIRM PASSWORD FIELD ====================
                         const Text(
                           'Confirm Password:',
                           style: TextStyle(
@@ -525,6 +625,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                                 horizontal: 20,
                                 vertical: 16,
                               ),
+                              // Separate toggle for confirm password visibility
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
@@ -554,7 +655,8 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                         const SizedBox(height: 30),
 
-                        // Confirm button
+                        // ==================== CONFIRM BUTTON ====================
+                        // Primary action button with gradient and shadow
                         Container(
                           width: double.infinity,
                           height: 56,
@@ -575,6 +677,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                             ],
                           ),
                           child: ElevatedButton(
+                            // Disable button while loading
                             onPressed: _isLoading ? null : handleSignUp,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
@@ -583,6 +686,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
+                            // Show loading spinner or "Confirm" text
                             child: _isLoading
                                 ? const SizedBox(
                               height: 20,
@@ -605,7 +709,8 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
 
                         const SizedBox(height: 20),
 
-                        // Already have an account - BIGGER and MORE CLICKABLE
+                        // ==================== BACK TO LOGIN LINK ====================
+                        // Clickable link to navigate back to login screen
                         Center(
                           child: Material(
                             color: Colors.transparent,
@@ -626,6 +731,7 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                                     width: 1,
                                   ),
                                 ),
+                                // Rich text with styled "Login" word
                                 child: RichText(
                                   text: const TextSpan(
                                     text: 'Already have an account? ',
@@ -659,8 +765,6 @@ class _FirebaseSignUpScreenState extends State<FirebaseSignUpScreen> {
                 );
               },
             ),
-
-
           ],
         ),
       ),
