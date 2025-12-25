@@ -10,7 +10,8 @@ plugins {
 
 android {
     namespace = "com.example.yala_fix"
-    compileSdk = 34  // ✅ Updated for better Firebase compatibility
+    // Some plugins require compiling against Android SDK 36 (or higher). Bump compileSdk to 36.
+    compileSdk = 35  // ✅ Updated for Firebase and plugin compatibility
 
     // ✅ Force NDK 27 (required by Firebase plugins)
     ndkVersion = "27.0.12077973"
@@ -26,8 +27,10 @@ android {
 
     defaultConfig {
         applicationId = "com.example.yala_fix"
+        // Firebase Auth requires minSdk 23; set explicitly instead of using flutter.minSdkVersion
         minSdk = 23
-        targetSdk = 34  // ✅ Updated to match compileSdk
+        // Align targetSdk with compileSdk so plugins that require SDK 36 build without warnings
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
