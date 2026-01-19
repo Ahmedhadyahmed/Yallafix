@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'help_center_screen.dart';
 
 class LiveChatScreen extends StatefulWidget {
-  const LiveChatScreen({Key? key}) : super(key: key);
+  const LiveChatScreen({super.key});
 
   @override
   State<LiveChatScreen> createState() => _LiveChatScreenState();

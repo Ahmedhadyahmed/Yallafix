@@ -3,7 +3,7 @@ import 'Login.dart'; // Import your login screen
 import 'service_login.dart'; // Import service provider login
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

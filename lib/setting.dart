@@ -60,7 +60,7 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.person_outline_rounded,
                   title: 'Profile Information',
                   subtitle: 'Update your personal details',
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onTap: () {
                     Navigator.push(
                       context,
@@ -75,7 +75,7 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.security_rounded,
                   title: 'Privacy & Security',
                   subtitle: 'Manage your privacy settings',
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onTap: () {
                     Navigator.push(
                       context,
@@ -99,7 +99,7 @@ class _SettingPageState extends State<SettingPage> {
                   title: 'Push Notifications',
                   subtitle: 'Receive service updates',
                   value: notificationsEnabled,
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onChanged: (value) {
                     setState(() {
                       notificationsEnabled = value;
@@ -112,7 +112,7 @@ class _SettingPageState extends State<SettingPage> {
                   title: 'Location Services',
                   subtitle: 'Allow location access',
                   value: locationEnabled,
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onChanged: (value) {
                     setState(() {
                       locationEnabled = value;
@@ -125,7 +125,7 @@ class _SettingPageState extends State<SettingPage> {
                   title: 'Dark Mode',
                   subtitle: 'Switch to dark theme',
                   value: darkModeEnabled,
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onChanged: (value) {
                     setState(() {
                       darkModeEnabled = value;
@@ -145,7 +145,7 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.help_outline_rounded,
                   title: 'Help Center',
                   subtitle: 'Get help and support',
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onTap: () {
                     Navigator.push(
                       context,
@@ -160,7 +160,7 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.feedback_outlined,
                   title: 'Send Feedback',
                   subtitle: 'Share your thoughts with us',
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onTap: () {
                     Navigator.push(
                       context,
@@ -183,7 +183,7 @@ class _SettingPageState extends State<SettingPage> {
                   icon: Icons.info_outline_rounded,
                   title: 'About Yalla Fix',
                   subtitle: 'Version 1.0.0',
-                  gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                  gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                   onTap: () {},
                 ),
               ],
@@ -222,9 +222,9 @@ class _SettingPageState extends State<SettingPage> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 18),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.logout_rounded, color: Colors.white, size: 22),
                         SizedBox(width: 12),
                         Text(
@@ -258,7 +258,7 @@ class _SettingPageState extends State<SettingPage> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -453,7 +453,7 @@ class _SettingPageState extends State<SettingPage> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: Colors.white,
+              activeThumbColor: Colors.white,
               activeTrackColor: const Color(0xFFFF9800),
               inactiveThumbColor: Colors.white,
               inactiveTrackColor: Colors.grey[300],

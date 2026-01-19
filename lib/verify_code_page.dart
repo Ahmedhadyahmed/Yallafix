@@ -11,7 +11,7 @@ class VerifyCodePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btnColor = const Color(0xFFBF7A19);
+    const btnColor = Color(0xFFBF7A19);
 
     return Scaffold(
       body: SafeArea(

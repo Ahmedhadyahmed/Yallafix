@@ -4,14 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:your_app_name/service.dart';
 import 'Account_screen.dart';
 import 'Activity_Page.dart';
-import 'old_Activity_Page.dart';
 import 'Login.dart';
 import 'forget_password.dart';
 import 'home_page.dart';
-import 'old_service.dart';
 import 'welcome_page.dart';
 import 'firebase_options.dart';
-import 'splash_screen.dart'; // Import the splash screen
+import 'splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

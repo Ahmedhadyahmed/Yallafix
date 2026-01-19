@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
+  const PaymentMethodScreen({super.key});
+
   @override
   _PaymentMethodScreenState createState() => _PaymentMethodScreenState();
 }
@@ -22,7 +24,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -38,7 +40,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               // Header
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -47,20 +49,20 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Color(0xFFFB923C).withOpacity(0.1),
+                              color: const Color(0xFFFB923C).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.arrow_back,
                               color: Color(0xFFFB923C),
                               size: 22,
                             ),
                           ),
                         ),
-                        SizedBox(width: 16),
-                        Column(
+                        const SizedBox(width: 16),
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -90,15 +92,15 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Column(
                     children: [
                       _buildWalletCard(),
-                      SizedBox(height: 28),
+                      const SizedBox(height: 28),
                       _buildPaymentMethodsList(),
-                      SizedBox(height: 28),
+                      const SizedBox(height: 28),
                       _buildAddPaymentButton(),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -113,9 +115,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget _buildWalletCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             Color(0xFFFB923C),
             Color(0xFFFBBF24),
@@ -126,9 +128,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFFB923C).withOpacity(0.25),
+            color: const Color(0xFFFB923C).withOpacity(0.25),
             blurRadius: 20,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -141,22 +143,22 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.25),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.account_balance_wallet,
                       color: Colors.white,
                       size: 26,
                     ),
                   ),
-                  SizedBox(width: 14),
+                  const SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Digital Wallet',
                         style: TextStyle(
                           fontSize: 16,
@@ -164,7 +166,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
                         'Your app balance',
                         style: TextStyle(
@@ -178,19 +180,19 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             'EGP ${walletBalance.toStringAsFixed(2)}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.15),
               borderRadius: BorderRadius.circular(12),
@@ -216,7 +218,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Saved Payment Methods',
           style: TextStyle(
             fontSize: 18,
@@ -224,7 +226,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             color: Color(0xFF1F2937),
           ),
         ),
-        SizedBox(height: 14),
+        const SizedBox(height: 14),
         ...paymentMethods.asMap().entries.map((entry) {
           int index = entry.key;
           PaymentMethod method = entry.value;
@@ -232,65 +234,65 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             children: [
               _buildPaymentMethodItem(method),
               if (index < paymentMethods.length - 1)
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }
 
   Widget _buildPaymentMethodItem(PaymentMethod method) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Color(0xFFE5E7EB),
+          color: const Color(0xFFE5E7EB),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Color(0xFFFED7AA),
+              color: const Color(0xFFFED7AA),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               _getPaymentMethodIcon(method.type),
-              color: Color(0xFFFB923C),
+              color: const Color(0xFFFB923C),
               size: 22,
             ),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   method.name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1F2937),
                   ),
                 ),
                 if (method.isDefault) ...[
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [
                           Color(0xFFFEF3C7),
                           Color(0xFFFED7AA),
@@ -298,7 +300,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Default',
                       style: TextStyle(
                         fontSize: 11,
@@ -313,7 +315,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Color(0xFFFED7AA).withOpacity(0.5),
+              color: const Color(0xFFFED7AA).withOpacity(0.5),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Material(
@@ -321,7 +323,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               child: InkWell(
                 onTap: () {},
                 borderRadius: BorderRadius.circular(10),
-                child: Padding(
+                child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: Text(
                     'Edit',
@@ -345,7 +347,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             Color(0xFFFB923C),
             Color(0xFFFBBF24),
@@ -354,9 +356,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFFB923C).withOpacity(0.3),
+            color: const Color(0xFFFB923C).withOpacity(0.3),
             blurRadius: 16,
-            offset: Offset(0, 6),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -365,7 +367,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         child: InkWell(
           onTap: _showAddPaymentMethodModal,
           borderRadius: BorderRadius.circular(14),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.add, color: Colors.white, size: 22),
@@ -415,7 +417,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 class AddPaymentMethodModal extends StatefulWidget {
   final Function(PaymentMethod) onPaymentMethodAdded;
 
-  const AddPaymentMethodModal({Key? key, required this.onPaymentMethodAdded}) : super(key: key);
+  const AddPaymentMethodModal({super.key, required this.onPaymentMethodAdded});
 
   @override
   _AddPaymentMethodModalState createState() => _AddPaymentMethodModalState();
@@ -437,7 +439,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -456,8 +458,8 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Color(0xFFE5E7EB)),
                   ),
@@ -465,7 +467,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Add Payment Method',
                       style: TextStyle(
                         fontSize: 18,
@@ -476,12 +478,12 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        padding: EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Color(0xFFF3F4F6),
+                          color: const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.close,
                           color: Color(0xFF6B7280),
                           size: 20,
@@ -493,7 +495,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               ),
               Flexible(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(24),
                   child: selectedType == null ? _buildPaymentTypeSelection() : _buildPaymentForm(),
                 ),
               ),
@@ -513,21 +515,21 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           'Credit/Debit Card',
           'Visa, Mastercard, etc.',
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         _buildPaymentTypeOption(
           PaymentMethodType.fawry,
           Icons.payment,
           'Fawry',
           'Pay with Fawry',
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         _buildPaymentTypeOption(
           PaymentMethodType.cash,
           Icons.money,
           'Cash',
           'Pay on delivery',
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -541,38 +543,38 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
       },
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
           borderRadius: BorderRadius.circular(14),
           color: Colors.white,
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Color(0xFFFED7AA),
+                color: const Color(0xFFFED7AA),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: Color(0xFFFB923C), size: 24),
+              child: Icon(icon, color: const Color(0xFFFB923C), size: 24),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1F2937),
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: Color(0xFF9CA3AF),
                   ),
@@ -598,7 +600,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                     selectedType = null;
                   });
                 },
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.arrow_back, color: Color(0xFFFB923C), size: 20),
                     SizedBox(width: 6),
@@ -615,24 +617,24 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           if (selectedType == PaymentMethodType.card) ..._buildCardForm(),
           if (selectedType == PaymentMethodType.fawry) ..._buildFawryForm(),
           if (selectedType == PaymentMethodType.cash) ..._buildCashForm(),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    side: BorderSide(color: Color(0xFFD1D5DB)),
+                    side: const BorderSide(color: Color(0xFFD1D5DB)),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Cancel',
                     style: TextStyle(
                       color: Color(0xFF374151),
@@ -642,11 +644,11 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                   ),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       colors: [
                         Color(0xFFFB923C),
                         Color(0xFFFBBF24),
@@ -659,12 +661,12 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
-                      padding: EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Save',
                       style: TextStyle(
                         color: Colors.white,
@@ -677,7 +679,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -690,14 +692,14 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
         decoration: InputDecoration(
           labelText: 'Card Number',
           hintText: '1234 5678 9012 3456',
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFFB923C), width: 2),
+            borderSide: const BorderSide(color: Color(0xFFFB923C), width: 2),
           ),
           suffixIcon: IconButton(
             icon: Icon(_obscureCardNumber ? Icons.visibility_off : Icons.visibility),
@@ -721,7 +723,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           return null;
         },
       ),
-      SizedBox(height: 16),
+      const SizedBox(height: 16),
       Row(
         children: [
           Expanded(
@@ -730,14 +732,14 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               decoration: InputDecoration(
                 labelText: 'Expiry Date',
                 hintText: 'MM/YY',
-                labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFFB923C), width: 2),
+                  borderSide: const BorderSide(color: Color(0xFFFB923C), width: 2),
                 ),
               ),
               keyboardType: TextInputType.number,
@@ -753,21 +755,21 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               },
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: TextFormField(
               controller: _cvvController,
               decoration: InputDecoration(
                 labelText: 'CVV',
                 hintText: '123',
-                labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFFB923C), width: 2),
+                  borderSide: const BorderSide(color: Color(0xFFFB923C), width: 2),
                 ),
               ),
               obscureText: true,
@@ -786,20 +788,20 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           ),
         ],
       ),
-      SizedBox(height: 16),
+      const SizedBox(height: 16),
       TextFormField(
         controller: _cardholderNameController,
         decoration: InputDecoration(
           labelText: 'Cardholder Name',
           hintText: 'John Doe',
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFFB923C), width: 2),
+            borderSide: const BorderSide(color: Color(0xFFFB923C), width: 2),
           ),
         ),
         validator: (value) {
@@ -819,14 +821,14 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
         decoration: InputDecoration(
           labelText: 'Fawry Number',
           hintText: 'Enter your Fawry number',
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFFB923C), width: 2),
+            borderSide: const BorderSide(color: Color(0xFFFB923C), width: 2),
           ),
         ),
         validator: (value) {
@@ -836,16 +838,16 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           return null;
         },
       ),
-      SizedBox(height: 16),
+      const SizedBox(height: 16),
       Container(
         width: double.infinity,
-        padding: EdgeInsets.all(14),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Color(0xFFFFF7ED),
+          color: const Color(0xFFFFF7ED),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xFFFED7AA)),
+          border: Border.all(color: const Color(0xFFFED7AA)),
         ),
-        child: Text(
+        child: const Text(
           'You can pay using Fawry at any nearby Fawry outlet or through the Fawry mobile app.',
           style: TextStyle(
             fontSize: 13,
@@ -865,17 +867,17 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           labelText: 'Cash Amount',
           hintText: '0.00',
           prefixText: 'EGP ',
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFFFB923C), width: 2),
+            borderSide: const BorderSide(color: Color(0xFFFB923C), width: 2),
           ),
         ),
-        keyboardType: TextInputType.numberWithOptions(decimal: true),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter cash amount';
@@ -883,16 +885,16 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
           return null;
         },
       ),
-      SizedBox(height: 16),
+      const SizedBox(height: 16),
       Container(
         width: double.infinity,
-        padding: EdgeInsets.all(14),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Color(0xFFFFF7ED),
+          color: const Color(0xFFFFF7ED),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xFFFED7AA)),
+          border: Border.all(color: const Color(0xFFFED7AA)),
         ),
-        child: Text(
+        child: const Text(
           'Cash payment will be collected upon delivery or at pickup location.',
           style: TextStyle(
             fontSize: 13,

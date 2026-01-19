@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 import 'Map_Screen.dart';
 import 'activity_manager.dart'; // NEW IMPORT
@@ -239,7 +238,7 @@ class _ServicesPageState extends State<ServicesPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Row(
+          title: const Row(
             children: [
               Icon(
                 Icons.check_circle_outline,
@@ -264,7 +263,7 @@ class _ServicesPageState extends State<ServicesPage> {
               children: [
                 // Service info
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: BorderRadius.circular(12),
@@ -273,7 +272,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   child: Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: service.color.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
@@ -284,23 +283,23 @@ class _ServicesPageState extends State<ServicesPage> {
                           size: 24,
                         ),
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               service.title,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                                 color: Colors.black87,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               'Price: ${service.price}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Color(0xFFFF8C00),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
@@ -319,11 +318,11 @@ class _ServicesPageState extends State<ServicesPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Location info
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.blue[50],
                     borderRadius: BorderRadius.circular(12),
@@ -332,13 +331,13 @@ class _ServicesPageState extends State<ServicesPage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.place, color: Colors.red, size: 24),
-                      SizedBox(width: 12),
+                      const Icon(Icons.place, color: Colors.red, size: 24),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Service Location:',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -346,7 +345,7 @@ class _ServicesPageState extends State<ServicesPage> {
                                 color: Colors.black87,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
                             Text(
                               address ?? 'Selected location on map',
                               style: TextStyle(
@@ -363,11 +362,11 @@ class _ServicesPageState extends State<ServicesPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Payment method selection
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.orange[50],
                     borderRadius: BorderRadius.circular(12),
@@ -379,8 +378,8 @@ class _ServicesPageState extends State<ServicesPage> {
                       Row(
                         children: [
                           Icon(Icons.payment, color: Colors.orange[700], size: 24),
-                          SizedBox(width: 8),
-                          Text(
+                          const SizedBox(width: 8),
+                          const Text(
                             'Payment Method',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
@@ -390,7 +389,7 @@ class _ServicesPageState extends State<ServicesPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
                       // Cash payment option
                       _buildPaymentOption(
@@ -401,7 +400,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         color: Colors.green,
                         setDialogState: setDialogState,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       // Saved card option
                       _buildPaymentOption(
@@ -412,7 +411,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         color: Colors.blue,
                         setDialogState: setDialogState,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       // Fawry option
                       _buildPaymentOption(
@@ -426,11 +425,11 @@ class _ServicesPageState extends State<ServicesPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Confirmation message
                 Container(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.green[50],
                     borderRadius: BorderRadius.circular(8),
@@ -439,7 +438,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   child: Row(
                     children: [
                       Icon(Icons.info_outline, color: Colors.green[700], size: 20),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Please confirm your service booking and payment details.',
@@ -474,12 +473,12 @@ class _ServicesPageState extends State<ServicesPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF8C00),
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Confirm Booking',
                 style: TextStyle(
                   color: Colors.white,
@@ -510,7 +509,7 @@ class _ServicesPageState extends State<ServicesPage> {
         });
       },
       child: Container(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: _selectedPaymentMethod == value
               ? color.withOpacity(0.1)
@@ -526,7 +525,7 @@ class _ServicesPageState extends State<ServicesPage> {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(6),
@@ -537,20 +536,20 @@ class _ServicesPageState extends State<ServicesPage> {
                 size: 20,
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                       color: Colors.black87,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: TextStyle(
@@ -612,7 +611,7 @@ class _ServicesPageState extends State<ServicesPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 Icon(Icons.check_circle, color: Colors.white, size: 20),
                 SizedBox(width: 8),
@@ -625,17 +624,17 @@ class _ServicesPageState extends State<ServicesPage> {
                 ),
               ],
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               message,
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 6),
+        duration: const Duration(seconds: 6),
         behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -680,7 +679,7 @@ class _ServicesPageState extends State<ServicesPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.receipt_long, color: Color(0xFFFF8C00)),
             SizedBox(width: 12),
@@ -697,9 +696,9 @@ class _ServicesPageState extends State<ServicesPage> {
             _buildDetailRow('Rating', '${service.rating}'),
             _buildDetailRow('Payment', _getPaymentMethodDisplayText(paymentMethod)),
             if (location != null) _buildDetailRow('Location', location),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.green[50],
                 borderRadius: BorderRadius.circular(8),
@@ -708,7 +707,7 @@ class _ServicesPageState extends State<ServicesPage> {
               child: Row(
                 children: [
                   Icon(Icons.info_outline, color: Colors.green[700], size: 20),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'You will receive updates about your booking via notifications.',
@@ -721,7 +720,7 @@ class _ServicesPageState extends State<ServicesPage> {
                 ],
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             // Payment specific information
             _buildPaymentInfoContainer(paymentMethod),
           ],
@@ -735,7 +734,7 @@ class _ServicesPageState extends State<ServicesPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Got it',
               style: TextStyle(color: Colors.white),
             ),
@@ -778,7 +777,7 @@ class _ServicesPageState extends State<ServicesPage> {
     }
 
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
@@ -787,7 +786,7 @@ class _ServicesPageState extends State<ServicesPage> {
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
@@ -823,7 +822,7 @@ class _ServicesPageState extends State<ServicesPage> {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black87,
                 fontSize: 14,
               ),

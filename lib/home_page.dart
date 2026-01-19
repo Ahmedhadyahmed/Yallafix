@@ -73,17 +73,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     PromoItem(
       title: '30% off your first\nservice call',
       subtitle: 'Get help now',
-      colors: [Color(0xFFFF8C00), Color(0xFFFFB84D)],
+      colors: [const Color(0xFFFF8C00), const Color(0xFFFFB84D)],
     ),
     PromoItem(
       title: '24/7 Emergency\nAssistance Available',
       subtitle: 'Call now',
-      colors: [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
+      colors: [const Color(0xFFFF6B6B), const Color(0xFFFF8E8E)],
     ),
     PromoItem(
       title: 'Free diagnostics\nwith any repair',
       subtitle: 'Book service',
-      colors: [Color(0xFF4ECDC4), Color(0xFF7EDDD8)],
+      colors: [const Color(0xFF4ECDC4), const Color(0xFF7EDDD8)],
     ),
   ];
 

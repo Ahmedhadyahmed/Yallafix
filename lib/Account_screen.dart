@@ -99,13 +99,13 @@ class _AccountPageState extends State<AccountPage> {
             children: [
               // Header with gradient background
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
@@ -171,7 +171,7 @@ class _AccountPageState extends State<AccountPage> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   gradient: _photoUrl == null
-                                      ? LinearGradient(
+                                      ? const LinearGradient(
                                     colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -179,7 +179,7 @@ class _AccountPageState extends State<AccountPage> {
                                       : null,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Color(0xFFFF9800).withOpacity(0.3),
+                                      color: const Color(0xFFFF9800).withOpacity(0.3),
                                       blurRadius: 15,
                                       offset: const Offset(0, 5),
                                     ),
@@ -231,8 +231,8 @@ class _AccountPageState extends State<AccountPage> {
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            Color(0xFFFF9800).withOpacity(0.15),
-                                            Color(0xFFFFB74D).withOpacity(0.15),
+                                            const Color(0xFFFF9800).withOpacity(0.15),
+                                            const Color(0xFFFFB74D).withOpacity(0.15),
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(20),
@@ -302,7 +302,7 @@ class _AccountPageState extends State<AccountPage> {
                                   _buildInfoRow(
                                     Icons.badge_rounded,
                                     'User ID',
-                                    _userId!.substring(0, 8) + '...',
+                                    '${_userId!.substring(0, 8)}...',
                                   ),
                                 ],
                                 if (_memberSince != null) ...[
@@ -337,7 +337,7 @@ class _AccountPageState extends State<AccountPage> {
                         icon: Icons.car_repair_rounded,
                         label: 'Services',
                         value: _totalServices.toString(),
-                        colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                        colors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -346,7 +346,7 @@ class _AccountPageState extends State<AccountPage> {
                         icon: Icons.history_rounded,
                         label: 'History',
                         value: _totalHistory.toString(),
-                        colors: [Color(0xFFFFB74D), Color(0xFFFFCC80)],
+                        colors: [const Color(0xFFFFB74D), const Color(0xFFFFCC80)],
                       ),
                     ),
                   ],
@@ -377,7 +377,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.directions_car_rounded,
                       label: "Car Information",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -389,11 +389,11 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.payment_rounded,
                       label: "Payment Methods",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => PaymentMethodScreen()),
+                          MaterialPageRoute(builder: (_) => const PaymentMethodScreen()),
                         );
                       },
                     ),
@@ -401,7 +401,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.settings_rounded,
                       label: "Settings",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -413,7 +413,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.message_rounded,
                       label: "Messages",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -425,7 +425,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.description_rounded,
                       label: "Terms & Services",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,

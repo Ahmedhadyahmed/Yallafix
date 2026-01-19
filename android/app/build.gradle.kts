@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId = "com.example.yala_fix"
         // Firebase Auth requires minSdk 23; set explicitly instead of using flutter.minSdkVersion
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         // Align targetSdk with compileSdk so plugins that require SDK 36 build without warnings
         targetSdk = 35
         versionCode = flutter.versionCode

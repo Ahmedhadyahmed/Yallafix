@@ -21,10 +21,10 @@ class PrivacyPolicyPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          child: SingleChildScrollView(
+          child: const SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   "Effective: 23 April 2025\n",
                   style: TextStyle(fontSize: 14, color: Colors.black54),

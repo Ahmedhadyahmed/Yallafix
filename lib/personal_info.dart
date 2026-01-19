@@ -102,13 +102,13 @@ class _AccountPageState extends State<AccountPage> {
             children: [
               // Header with gradient background
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
@@ -175,14 +175,14 @@ class _AccountPageState extends State<AccountPage> {
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: LinearGradient(
+                              gradient: const LinearGradient(
                                 colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFFFF9800).withOpacity(0.3),
+                                  color: const Color(0xFFFF9800).withOpacity(0.3),
                                   blurRadius: 15,
                                   offset: const Offset(0, 5),
                                 ),
@@ -224,49 +224,26 @@ class _AccountPageState extends State<AccountPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color(0xFFFF9800).withOpacity(0.15),
-                                        Color(0xFFFFB74D).withOpacity(0.15),
-                                      ],
+                                // Show email and phone if available so fields are used
+                                if (!_loading && (_email != null && _email!.isNotEmpty))
+                                  Text(
+                                    _email!,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[700],
                                     ),
-                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(
-                                        Icons.star_rounded,
-                                        size: 18,
-                                        color: Color(0xFFFF9800),
+                                if (!_loading && (_phoneNumber != null && _phoneNumber!.isNotEmpty))
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 6),
+                                    child: Text(
+                                      _phoneNumber!,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
                                       ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "5.0",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFFF9800),
-                                        ),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "Rating",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Color(0xFFFF9800),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
@@ -291,7 +268,7 @@ class _AccountPageState extends State<AccountPage> {
                         icon: Icons.car_repair_rounded,
                         label: 'Services',
                         value: '12',
-                        colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                        colors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -300,7 +277,7 @@ class _AccountPageState extends State<AccountPage> {
                         icon: Icons.history_rounded,
                         label: 'History',
                         value: '8',
-                        colors: [Color(0xFFFFB74D), Color(0xFFFFCC80)],
+                        colors: [const Color(0xFFFFB74D), const Color(0xFFFFCC80)],
                       ),
                     ),
                   ],
@@ -331,7 +308,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.directions_car_rounded,
                       label: "Car Information",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -343,11 +320,11 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.payment_rounded,
                       label: "Payment Methods",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => PaymentMethodScreen()),
+                          MaterialPageRoute(builder: (_) => const PaymentMethodScreen()),
                         );
                       },
                     ),
@@ -355,7 +332,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.settings_rounded,
                       label: "Settings",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -367,7 +344,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.message_rounded,
                       label: "Messages",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -379,7 +356,7 @@ class _AccountPageState extends State<AccountPage> {
                     _buildMenuButton(
                       icon: Icons.description_rounded,
                       label: "Terms & Services",
-                      gradientColors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                      gradientColors: [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
                       onTap: () {
                         Navigator.push(
                           context,
@@ -724,7 +701,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 ),
               ),
               child: _saving
-                  ? SizedBox(
+                  ? const SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(
@@ -758,7 +735,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         ),
         child: SafeArea(
           child: _loading
-              ? Center(child: CircularProgressIndicator(color: Colors.white))
+              ? const Center(child: CircularProgressIndicator(color: Colors.white))
               : SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Form(
@@ -823,10 +800,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                   : null,
             ),
             child: photoUrl == null
-                ? Icon(
+                ? const Icon(
               Icons.person,
               size: 60,
-              color: const Color(0xFFFF9800),
+              color: Color(0xFFFF9800),
             )
                 : null,
           ),
@@ -960,7 +937,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: const Color(0xFFFF9800), width: 2),
+                borderSide: const BorderSide(color: Color(0xFFFF9800), width: 2),
               ),
               filled: true,
               fillColor: Colors.orange[50]?.withOpacity(0.3),
@@ -1002,25 +979,25 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         },
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 18),
-          side: BorderSide(color: const Color(0xFFFF9800), width: 2),
+          side: const BorderSide(color: Color(0xFFFF9800), width: 2),
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.lock_outline_rounded,
-              color: const Color(0xFFFF9800),
+              color: Color(0xFFFF9800),
               size: 20,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'Change Password',
               style: TextStyle(
-                color: const Color(0xFFFF9800),
+                color: Color(0xFFFF9800),
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),

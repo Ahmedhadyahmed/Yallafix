@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ServiceProviderSignUpScreen extends StatefulWidget {
-  const ServiceProviderSignUpScreen({Key? key}) : super(key: key);
+  const ServiceProviderSignUpScreen({super.key});
 
   @override
   State<ServiceProviderSignUpScreen> createState() => _ServiceProviderSignUpScreenState();

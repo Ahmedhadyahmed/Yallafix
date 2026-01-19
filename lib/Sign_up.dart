@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// Sign Up screen widget for creating new user accounts with Firebase Authentication
 /// Includes comprehensive form validation and user feedback
 class FirebaseSignUpScreen extends StatefulWidget {
-  const FirebaseSignUpScreen({Key? key}) : super(key: key);
+  const FirebaseSignUpScreen({super.key});
 
   @override
   State<FirebaseSignUpScreen> createState() => _FirebaseSignUpScreenState();

@@ -37,9 +37,9 @@ class _TermsAndServicesPageState extends State<TermsAndServicesPage> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Expanded(
+              const Expanded(
                 child: SingleChildScrollView(
-                  child: const Text(
+                  child: Text(
                     """Welcome to YallaFIX
 
 By using this application, you agree to the following terms:

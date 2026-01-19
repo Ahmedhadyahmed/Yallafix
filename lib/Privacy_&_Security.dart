@@ -111,10 +111,10 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 4),
         ),
-        child: Icon(
+        child: const Icon(
           Icons.security_rounded,
           size: 60,
-          color: const Color(0xFFFF9800),
+          color: Color(0xFFFF9800),
         ),
       ),
     );
@@ -327,7 +327,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFFFF9800),
+            activeThumbColor: const Color(0xFFFF9800),
           ),
         ],
       ),

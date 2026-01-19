@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ServiceProviderLoginScreen extends StatefulWidget {
-  const ServiceProviderLoginScreen({Key? key}) : super(key: key);
+  const ServiceProviderLoginScreen({super.key});
 
   @override
   State<ServiceProviderLoginScreen> createState() => _ServiceProviderLoginScreenState();
@@ -304,9 +304,9 @@ class _ServiceProviderLoginScreenState extends State<ServiceProviderLoginScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.info_outline_rounded,
-                          color: const Color(0xFFFF7A00),
+                          color: Color(0xFFFF7A00),
                           size: 24,
                         ),
                         const SizedBox(width: 12),

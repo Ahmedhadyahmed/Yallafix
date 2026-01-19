@@ -6,7 +6,7 @@ import 'forget_password.dart';
 /// Main login screen widget using Firebase Authentication
 /// This screen allows users to sign in with email and password
 class FirebaseLoginScreen extends StatefulWidget {
-  const FirebaseLoginScreen({Key? key, String? userType}) : super(key: key);
+  const FirebaseLoginScreen({super.key, String? userType});
 
   @override
   State<FirebaseLoginScreen> createState() => _FirebaseLoginScreenState();
@@ -377,7 +377,7 @@ class _FirebaseLoginScreenState extends State<FirebaseLoginScreen> {
 
                             // ==================== CREATE ACCOUNT BUTTON ====================
                             // Secondary action button with border (outlined style)
-                            Container(
+                            SizedBox(
                               width: double.infinity,
                               child: Material(
                                 color: Colors.transparent,

@@ -425,7 +425,7 @@ class _TermsAndServicesScreenState extends State<TermsAndServicesScreen> {
                 height: 1.5,
               ),
             ),
-          )).toList(),
+          )),
         ],
       ),
     );

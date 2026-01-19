@@ -16,24 +16,24 @@ class AlexandriaMapScreen extends StatefulWidget {
   final ServiceItem? serviceItem; // Add this to receive service information
 
   const AlexandriaMapScreen({
-    Key? key,
+    super.key,
     this.title,
     this.initialLocation,
     this.initialZoom,
     this.showCurrentLocation = true,
     this.customMarkers,
     this.serviceItem, // Add this parameter
-  }) : super(key: key);
+  });
 
   @override
-  _AlexandriaMapScreenState createState() => _AlexandriaMapScreenState();
+  State<AlexandriaMapScreen> createState() => _AlexandriaMapScreenState();
 }
 
 class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  Location _location = Location();
+  final Location _location = Location();
 
   // Alexandria, Egypt coordinates
   static const LatLng _alexandriaCenter = LatLng(31.2001, 29.9187);
@@ -135,6 +135,9 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
 
     // Show confirmation dialog for search result
     _showSearchResultConfirmationDialog(result);
+
+    // Also navigate to and mark the search result on the map so those fields are actually used
+    _navigateToSearchResult(result);
   }
 
   void _togglePinSelectionMode() {
@@ -199,7 +202,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.place, color: Colors.red),
             SizedBox(width: 8),
@@ -210,21 +213,21 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Selected location:'),
-            SizedBox(height: 8),
+            const Text('Selected location:'),
+            const SizedBox(height: 8),
             Text(
               _selectedLocationAddress ?? 'Unknown location',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Coordinates: ${_selectedPinLocation!.latitude.toStringAsFixed(4)}, ${_selectedPinLocation!.longitude.toStringAsFixed(4)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
             if (widget.serviceItem != null) ...[
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
@@ -232,10 +235,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 child: Row(
                   children: [
                     Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Service: ${widget.serviceItem!.title}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -255,7 +258,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 _selectedLocationAddress = null;
               });
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -265,7 +268,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[800],
             ),
-            child: Text(
+            child: const Text(
               'Confirm Location',
               style: TextStyle(color: Colors.white),
             ),
@@ -280,7 +283,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.search, color: Colors.blue),
             SizedBox(width: 8),
@@ -291,26 +294,26 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Found location:'),
-            SizedBox(height: 8),
+            const Text('Found location:'),
+            const SizedBox(height: 8),
             Text(
               result.name,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               result.address,
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Coordinates: ${result.location.latitude.toStringAsFixed(4)}, ${result.location.longitude.toStringAsFixed(4)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
             if (widget.serviceItem != null) ...[
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
@@ -318,10 +321,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 child: Row(
                   children: [
                     Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Service: ${widget.serviceItem!.title}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -338,7 +341,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
               Navigator.of(context).pop();
               _clearSearchSelection();
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -348,7 +351,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[800],
             ),
-            child: Text(
+            child: const Text(
               'Confirm Location',
               style: TextStyle(color: Colors.white),
             ),
@@ -365,7 +368,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.my_location, color: Colors.blue),
             SizedBox(width: 8),
@@ -376,21 +379,21 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Use your current location:'),
-            SizedBox(height: 8),
-            Text(
+            const Text('Use your current location:'),
+            const SizedBox(height: 8),
+            const Text(
               'Current Position',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Coordinates: ${_currentLocation!.latitude.toStringAsFixed(4)}, ${_currentLocation!.longitude.toStringAsFixed(4)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
             if (widget.serviceItem != null) ...[
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
@@ -398,10 +401,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 child: Row(
                   children: [
                     Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Service: ${widget.serviceItem!.title}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -415,7 +418,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -425,7 +428,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[800],
             ),
-            child: Text(
+            child: const Text(
               'Confirm Location',
               style: TextStyle(color: Colors.white),
             ),
@@ -464,7 +467,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.place, color: Colors.red),
             SizedBox(width: 8),
@@ -475,21 +478,21 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Selected location:'),
-            SizedBox(height: 8),
+            const Text('Selected location:'),
+            const SizedBox(height: 8),
             Text(
               _selectedLocationAddress ?? 'Unknown location',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Coordinates: ${_selectedPinLocation!.latitude.toStringAsFixed(4)}, ${_selectedPinLocation!.longitude.toStringAsFixed(4)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
             if (widget.serviceItem != null) ...[
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
@@ -497,10 +500,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 child: Row(
                   children: [
                     Icon(widget.serviceItem!.icon, color: widget.serviceItem!.color, size: 20),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Service: ${widget.serviceItem!.title}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -520,7 +523,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 _selectedLocationAddress = null;
               });
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -530,7 +533,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[800],
             ),
-            child: Text(
+            child: const Text(
               'Confirm Location',
               style: TextStyle(color: Colors.white),
             ),
@@ -567,7 +570,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
         point: result.location,
         child: GestureDetector(
           onTap: () => _showMarkerInfo(result.name, result.displayName),
-          child: Container(
+          child: const SizedBox(
             width: 40,
             height: 40,
             child: Icon(
@@ -727,12 +730,12 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Location Service Required'),
-        content: Text('Please enable location services to use this feature.'),
+        title: const Text('Location Service Required'),
+        content: const Text('Please enable location services to use this feature.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -743,19 +746,19 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Location Permission Required'),
-        content: Text('Please grant location permission to use this feature.'),
+        title: const Text('Location Permission Required'),
+        content: const Text('Please grant location permission to use this feature.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _initializeLocation();
             },
-            child: Text('Retry'),
+            child: const Text('Retry'),
           ),
         ],
       ),
@@ -767,7 +770,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -777,7 +780,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -790,7 +793,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
       markers.add(
         Marker(
           point: _currentLocation!,
-          child: Container(
+          child: SizedBox(
             width: 50,
             height: 50,
             child: Stack(
@@ -801,7 +804,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                   color: Colors.blue.withOpacity(0.3),
                   size: 50,
                 ),
-                Icon(
+                const Icon(
                   Icons.my_location,
                   color: Colors.blue,
                   size: 30,
@@ -823,7 +826,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 'Selected Location',
                 _selectedLocationAddress ?? 'Custom selected location'
             ),
-            child: Container(
+            child: SizedBox(
               width: 50,
               height: 50,
               child: Stack(
@@ -836,7 +839,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                     size: 50,
                   ),
                   // Main pin
-                  Icon(
+                  const Icon(
                     Icons.location_pin,
                     color: Colors.red,
                     size: 40,
@@ -853,10 +856,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
     markers.addAll([
       // Citadel of Qaitbay
       Marker(
-        point: LatLng(31.2139, 29.8850),
+        point: const LatLng(31.2139, 29.8850),
         child: GestureDetector(
           onTap: () => _showMarkerInfo('Citadel of Qaitbay', 'Historic fortress'),
-          child: Container(
+          child: const SizedBox(
             width: 40,
             height: 40,
             child: Icon(
@@ -870,10 +873,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
 
       // Library of Alexandria
       Marker(
-        point: LatLng(31.2084, 29.9097),
+        point: const LatLng(31.2084, 29.9097),
         child: GestureDetector(
           onTap: () => _showMarkerInfo('Library of Alexandria', 'Modern library and cultural center'),
-          child: Container(
+          child: const SizedBox(
             width: 40,
             height: 40,
             child: Icon(
@@ -887,10 +890,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
 
       // Alexandria Port
       Marker(
-        point: LatLng(31.2027, 29.8869),
+        point: const LatLng(31.2027, 29.8869),
         child: GestureDetector(
           onTap: () => _showMarkerInfo('Alexandria Port', 'Major Mediterranean port'),
-          child: Container(
+          child: const SizedBox(
             width: 40,
             height: 40,
             child: Icon(
@@ -904,10 +907,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
 
       // Montaza Palace
       Marker(
-        point: LatLng(31.2893, 30.0144),
+        point: const LatLng(31.2893, 30.0144),
         child: GestureDetector(
           onTap: () => _showMarkerInfo('Montaza Palace', 'Royal palace and gardens'),
-          child: Container(
+          child: const SizedBox(
             width: 40,
             height: 40,
             child: Icon(
@@ -925,6 +928,11 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
       markers.addAll(widget.customMarkers!);
     }
 
+    // Add search marker if a search result was navigated to
+    if (_searchMarker != null) {
+      markers.add(_searchMarker!);
+    }
+
     return markers;
   }
 
@@ -937,7 +945,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Close'),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -946,7 +954,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       child: Column(
         children: [
           Container(
@@ -957,7 +965,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -970,15 +978,15 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: _clearSearchSelection,
                 )
                     : _isSearching
                     ? Container(
                   width: 20,
                   height: 20,
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  padding: const EdgeInsets.all(12),
+                  child: const CircularProgressIndicator(strokeWidth: 2),
                 )
                     : null,
                 border: OutlineInputBorder(
@@ -987,7 +995,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 ),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
               onSubmitted: (value) {
                 if (value.isNotEmpty) {
@@ -1000,7 +1008,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           // Search results dropdown
           if (_showSearchResults && _searchResults.isNotEmpty)
             Container(
-              margin: EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -1008,21 +1016,21 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 10,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              constraints: BoxConstraints(maxHeight: 200),
+              constraints: const BoxConstraints(maxHeight: 200),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
                   final result = _searchResults[index];
                   return ListTile(
-                    leading: Icon(Icons.place, color: Colors.red),
+                    leading: const Icon(Icons.place, color: Colors.red),
                     title: Text(
                       result.name,
-                      style: TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                     subtitle: Text(
                       result.address,
@@ -1053,7 +1061,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
           if (widget.showCurrentLocation)
             IconButton(
               icon: _isLoadingLocation
-                  ? SizedBox(
+                  ? const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
@@ -1061,12 +1069,12 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                   color: Colors.white,
                 ),
               )
-                  : Icon(Icons.my_location),
+                  : const Icon(Icons.my_location),
               onPressed: _isLoadingLocation ? null : _getCurrentLocation,
               tooltip: 'Get Current Location',
             ),
           IconButton(
-            icon: Icon(Icons.location_city),
+            icon: const Icon(Icons.location_city),
             onPressed: _moveToAlexandria,
             tooltip: 'Go to Alexandria',
           ),
@@ -1092,7 +1100,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 initialZoom: widget.initialZoom ?? 12.0,
                 minZoom: 3.0,
                 maxZoom: 18.0,
-                interactionOptions: InteractionOptions(
+                interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
                 onTap: _onMapTapped,
@@ -1136,6 +1144,49 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
               child: _buildSearchBar(),
             ),
 
+            // Small inline overlay to show selected search result (reads _selectedSearchResult)
+            if (_selectedSearchResult != null)
+              Positioned(
+                top: 110,
+                left: 16,
+                right: 16,
+                child: GestureDetector(
+                  onTap: () => _showSearchResultConfirmationDialog(_selectedSearchResult!),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.place, color: Colors.red),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _selectedSearchResult!.name,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _clearSearchSelection,
+                          child: const Text('Clear'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
             // Pin selection mode overlay
             if (_isPinSelectionMode)
               Positioned(
@@ -1143,7 +1194,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 left: 16,
                 right: 16,
                 child: Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.blue[800],
                     borderRadius: BorderRadius.circular(12),
@@ -1151,15 +1202,15 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
                         blurRadius: 10,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.touch_app, color: Colors.white),
-                      SizedBox(width: 12),
-                      Expanded(
+                      const Icon(Icons.touch_app, color: Colors.white),
+                      const SizedBox(width: 12),
+                      const Expanded(
                         child: Text(
                           'Tap anywhere on the map to select location',
                           style: TextStyle(
@@ -1171,7 +1222,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                       ),
                       TextButton(
                         onPressed: _togglePinSelectionMode,
-                        child: Text(
+                        child: const Text(
                           'Cancel',
                           style: TextStyle(color: Colors.white),
                         ),
@@ -1188,7 +1239,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                 left: 16,
                 right: 16,
                 child: Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -1196,7 +1247,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
-                        offset: Offset(0, -2),
+                        offset: const Offset(0, -2),
                       ),
                     ],
                   ),
@@ -1204,7 +1255,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.place, color: Colors.red),
                           SizedBox(width: 8),
@@ -1217,7 +1268,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         _selectedLocationAddress!,
                         style: TextStyle(
@@ -1227,7 +1278,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -1242,10 +1293,10 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                                 backgroundColor: Colors.grey[300],
                                 foregroundColor: Colors.black,
                               ),
-                              child: Text('Clear'),
+                              child: const Text('Clear'),
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: _confirmSelectedLocation,
@@ -1253,7 +1304,7 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
                                 backgroundColor: Colors.blue[800],
                                 foregroundColor: Colors.white,
                               ),
-                              child: Text('Confirm'),
+                              child: const Text('Confirm'),
                             ),
                           ),
                         ],
@@ -1273,44 +1324,44 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
             heroTag: "pin_selection",
             onPressed: _togglePinSelectionMode,
             backgroundColor: _isPinSelectionMode ? Colors.red : Colors.purple,
+            tooltip: _isPinSelectionMode ? 'Cancel Pin Selection' : 'Select Location with Pin',
             child: Icon(
               _isPinSelectionMode ? Icons.close : Icons.add_location,
               color: Colors.white,
             ),
-            tooltip: _isPinSelectionMode ? 'Cancel Pin Selection' : 'Select Location with Pin',
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
 
           // Current location button
           FloatingActionButton(
             heroTag: "current_location",
             onPressed: _moveToCurrentLocation,
             backgroundColor: Colors.blue,
-            child: Icon(Icons.my_location, color: Colors.white),
             tooltip: 'Go to Current Location',
+            child: const Icon(Icons.my_location, color: Colors.white),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
 
           // Location tracking toggle
           FloatingActionButton(
             heroTag: "location_tracking",
             onPressed: _toggleLocationTracking,
             backgroundColor: _isLocationTrackingActive ? Colors.red : Colors.green,
+            tooltip: _isLocationTrackingActive ? 'Stop Tracking' : 'Start Tracking',
             child: Icon(
               _isLocationTrackingActive ? Icons.stop : Icons.track_changes,
               color: Colors.white,
             ),
-            tooltip: _isLocationTrackingActive ? 'Stop Tracking' : 'Start Tracking',
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
 
           // Alexandria center button
           FloatingActionButton(
             heroTag: "alexandria_center",
             onPressed: _moveToAlexandria,
             backgroundColor: Colors.orange,
-            child: Icon(Icons.location_city, color: Colors.white),
             tooltip: 'Go to Alexandria Center',
+            child: const Icon(Icons.location_city, color: Colors.white),
           ),
         ],
       ) : Column(
@@ -1321,21 +1372,21 @@ class _AlexandriaMapScreenState extends State<AlexandriaMapScreen> {
             heroTag: "pin_selection",
             onPressed: _togglePinSelectionMode,
             backgroundColor: _isPinSelectionMode ? Colors.red : Colors.purple,
+            tooltip: _isPinSelectionMode ? 'Cancel Pin Selection' : 'Select Location with Pin',
             child: Icon(
               _isPinSelectionMode ? Icons.close : Icons.add_location,
               color: Colors.white,
             ),
-            tooltip: _isPinSelectionMode ? 'Cancel Pin Selection' : 'Select Location with Pin',
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
 
           // Alexandria center button
           FloatingActionButton(
             heroTag: "alexandria_center",
             onPressed: _moveToAlexandria,
             backgroundColor: Colors.orange,
-            child: Icon(Icons.location_city, color: Colors.white),
             tooltip: 'Go to Alexandria Center',
+            child: const Icon(Icons.location_city, color: Colors.white),
           ),
         ],
       ),
@@ -1427,3 +1478,4 @@ class MapNavigation {
     );
   }
 }
+
