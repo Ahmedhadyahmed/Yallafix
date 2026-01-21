@@ -1453,17 +1453,18 @@ class PlaceSearchResult {
 }
 
 // Helper class for navigation
+// Helper class for navigation
 class MapNavigation {
-  static void navigateToMap(
+  static Future<Map<String, dynamic>?> navigateToMap(
       BuildContext context, {
         String? title,
         LatLng? initialLocation,
         double? initialZoom,
         bool showCurrentLocation = true,
         List<Marker>? customMarkers,
-        ServiceItem? serviceItem, // Add this parameter
-      }) {
-    Navigator.push(
+        ServiceItem? serviceItem,
+      }) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
         builder: (context) => AlexandriaMapScreen(
@@ -1472,10 +1473,11 @@ class MapNavigation {
           initialZoom: initialZoom,
           showCurrentLocation: showCurrentLocation,
           customMarkers: customMarkers,
-          serviceItem: serviceItem, // Pass the service item
+          serviceItem: serviceItem,
         ),
       ),
     );
+    return result;
   }
 }
 

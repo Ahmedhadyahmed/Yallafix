@@ -327,7 +327,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: const Color(0xFFFF9800),
+            activeTrackColor: const Color(0xFFFF9800),
           ),
         ],
       ),

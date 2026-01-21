@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'activity_manager.dart'; // NEW IMPORT
+import 'package:provider/provider.dart';
+import 'Theme_Provider.dart';
+import 'activity_manager.dart';
 
-/// ActivityPage displays the user's service activity history
-/// Shows upcoming, completed, and cancelled services with filtering and search capabilities
 class ActivityPage extends StatefulWidget {
   const ActivityPage({super.key});
 
@@ -10,326 +10,96 @@ class ActivityPage extends StatefulWidget {
   State<ActivityPage> createState() => _ActivityPageState();
 }
 
-/// State class for ActivityPage that manages activity data, filtering, and search
-/// Uses TickerProviderStateMixin for animation support
-class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMixin {
-  // Currently selected filter index (0=All, 1=Upcoming, 2=Completed, 3=Cancelled)
-  int _selectedFilterIndex = 0;
-
-  // Available filter options displayed as chips
-  final List<String> _filterOptions = ['All', 'Upcoming', 'Completed', 'Cancelled'];
-
-  // Animation controller for smooth transitions
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-
-  // Search functionality state
-  String _searchQuery = '';
-  bool _isSearching = false;
-  final TextEditingController _searchController = TextEditingController();
-
-  // Activity data
-  List<ActivityItemData> _allActivities = [];
+class _ActivityPageState extends State<ActivityPage> {
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-
-    // Initialize animation controller with 300ms duration
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    // Create fade animation from transparent to opaque
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-
-    // Load activities from ActivityManager
-    _loadActivitiesFromManager();
-
-    // Listen for activity changes
+    _initializeActivities();
     ActivityManager().addListener(_onActivitiesChanged);
-
-    // Start fade-in animation
-    _animationController.forward();
   }
 
-  // Load activities from ActivityManager
-  void _loadActivitiesFromManager() {
-    final managerActivities = ActivityManager().activities;
-
-    // If manager has activities, use them; otherwise use mock data
-    if (managerActivities.isEmpty) {
-      _allActivities = _getMockActivities();
-    } else {
-      _allActivities = List.from(managerActivities);
+  Future<void> _initializeActivities() async {
+    setState(() => _isLoading = true);
+    await ActivityManager().initialize();
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
 
-  // Called when activities change in ActivityManager
   void _onActivitiesChanged() {
-    setState(() {
-      _allActivities = List.from(ActivityManager().activities);
-    });
-  }
-
-  /// Returns a list of mock activities for testing
-  List<ActivityItemData> _getMockActivities() {
-    return [
-      ActivityItemData(
-        id: '1',
-        serviceName: 'Tow Service',
-        date: 'Nov 15, 2025 - 10:00 AM',
-        status: ActivityStatus.upcoming,
-        price: '\$120.00',
-        rating: null,
-        description: 'Vehicle towing from downtown to repair shop',
-        serviceProvider: 'Quick Tow Services',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '2',
-        serviceName: 'Battery Service',
-        date: 'Nov 10, 2025 - 2:30 PM',
-        status: ActivityStatus.completed,
-        price: '\$85.00',
-        rating: 4.5,
-        description: 'Battery replacement and electrical system check',
-        serviceProvider: 'Auto Care Plus',
-        comments: null,
-      ),
-      ActivityItemData(
-        id: '3',
-        serviceName: 'Mobile Mechanic',
-        date: 'Nov 8, 2025 - 9:00 AM',
-        status: ActivityStatus.completed,
-        price: '\$150.00',
-        rating: 5.0,
-        description: 'On-site engine diagnostics and minor repairs',
-        serviceProvider: 'Mobile Auto Experts',
-        comments: null,
-      ),
-    ];
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
-    // Clean up resources to prevent memory leaks
-    _animationController.dispose();
-    _searchController.dispose();
     ActivityManager().removeListener(_onActivitiesChanged);
     super.dispose();
   }
 
-  /// Returns filtered activities based on selected filter and search query
-  /// Applies both status filter and text search
-  List<ActivityItemData> get _filteredActivities {
-    List<ActivityItemData> filtered = _allActivities;
-
-    // Apply status filter (All, Upcoming, Completed, Cancelled)
-    if (_selectedFilterIndex != 0) {
-      // Convert filter index to ActivityStatus enum
-      ActivityStatus filterStatus = ActivityStatus.values[_selectedFilterIndex - 1];
-      filtered = filtered.where((activity) => activity.status == filterStatus).toList();
-    }
-
-    // Apply search filter - searches in service name, provider, and description
-    if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((activity) =>
-      activity.serviceName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          activity.serviceProvider.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          activity.description.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
-    }
-
-    return filtered;
-  }
-
-  /// Toggles search mode on/off
-  /// Clears search query when exiting search mode
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-      if (!_isSearching) {
-        _searchController.clear();
-        _searchQuery = '';
-      }
-    });
-  }
-
-  /// Simulates refresh with a delay
-  Future<void> _refreshActivities() async {
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _loadActivitiesFromManager();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final activities = ActivityManager().activities;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Light grey background
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0, // Flat design
-        // Show search field when in search mode, otherwise show title
-        title: _isSearching
-            ? TextField(
-          controller: _searchController,
-          autofocus: true, // Auto-focus when entering search mode
-          decoration: const InputDecoration(
-            hintText: 'Search activities...',
-            border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.grey),
-          ),
-          style: const TextStyle(color: Colors.black, fontSize: 16),
-          onChanged: (value) {
-            setState(() {
-              _searchQuery = value;
-            });
-          },
-        )
-            : const Text(
-          'Activity',
-          style: TextStyle(
-            color: Color(0xFFFF8C00), // Brand orange
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        actions: [
-          // Toggle between search and close icon
-          IconButton(
-            icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
-              color: const Color(0xFFFF8C00),
-            ),
-            onPressed: _toggleSearch,
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
+      backgroundColor: isDark ? const Color(0xFF221910) : const Color(0xFFF8F7F5),
+      body: SafeArea(
         child: Column(
           children: [
-            // Filter chips section (All, Upcoming, Completed, Cancelled)
-            Container(
-              height: 60,
-              color: Colors.white,
-              child: Column(
-                children: [
-                  // Horizontal scrollable filter chips
-                  SizedBox(
-                    height: 50,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _filterOptions.length,
-                      itemBuilder: (context, index) {
-                        final isSelected = _selectedFilterIndex == index;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12.0),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            child: FilterChip(
-                              label: Text(_filterOptions[index]),
-                              selected: isSelected,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  // Update selected filter
-                                  _selectedFilterIndex = selected ? index : 0;
-                                });
-                              },
-                              selectedColor: const Color(0xFFFF8C00),
-                              checkmarkColor: Colors.white,
-                              labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : const Color(0xFF666666),
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                              ),
-                              backgroundColor: Colors.grey.shade50,
-                              shape: StadiumBorder(
-                                side: BorderSide(
-                                  color: isSelected ? const Color(0xFFFF8C00) : Colors.grey.shade300,
-                                  width: isSelected ? 2 : 1,
-                                ),
-                              ),
-                              elevation: isSelected ? 2 : 0,
-                              pressElevation: 4,
+            _buildHeader(isDark),
+            Expanded(
+              child: _isLoading
+                  ? Center(
+                child: CircularProgressIndicator(
+                  color: const Color(0xFFF48C25),
+                ),
+              )
+                  : activities.isEmpty
+                  ? _buildEmptyState(isDark)
+                  : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      _buildStatsCards(isDark),
+                      const SizedBox(height: 32),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Past Services',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF181411),
                             ),
                           ),
-                        );
-                      },
-                    ),
+                          if (activities.isNotEmpty)
+                            TextButton.icon(
+                              onPressed: () => _showClearAllDialog(isDark),
+                              icon: const Icon(Icons.delete_outline, size: 18),
+                              label: const Text('Clear All'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ...activities.map((activity) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _buildActivityCard(activity, isDark),
+                      )),
+                      const SizedBox(height: 100),
+                    ],
                   ),
-                  // Divider line below filters
-                  Container(
-                    height: 1,
-                    color: Colors.grey.shade200,
-                  ),
-                ],
-              ),
-            ),
-            // Results count and sort button
-            if (_filteredActivities.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                color: Colors.white,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Display count of filtered activities
-                    Text(
-                      '${_filteredActivities.length} ${_filteredActivities.length == 1 ? 'activity' : 'activities'}',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    // Sort button (functionality not yet implemented)
-                    TextButton.icon(
-                      onPressed: () {
-                        // TODO: Add sort functionality
-                      },
-                      icon: const Icon(Icons.sort, size: 16),
-                      label: const Text('Sort'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFFF8C00),
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            // Activities list with pull-to-refresh
-            Expanded(
-              child: _filteredActivities.isEmpty
-                  ? _buildEmptyState() // Show empty state message
-                  : RefreshIndicator(
-                color: const Color(0xFFFF8C00),
-                onRefresh: _refreshActivities, // Refresh activities on pull
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _filteredActivities.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final activity = _filteredActivities[index];
-                    // Staggered animation for list items
-                    return AnimatedContainer(
-                      duration: Duration(milliseconds: 200 + (index * 50)),
-                      curve: Curves.easeInOut,
-                      child: EnhancedActivityItem(
-                        data: activity,
-                        onTap: () => _showActivityDetails(activity),
-                      ),
-                    );
-                  },
                 ),
               ),
             ),
@@ -339,261 +109,303 @@ class _ActivityPageState extends State<ActivityPage> with TickerProviderStateMix
     );
   }
 
-  /// Builds the empty state UI when no activities match the current filter/search
-  /// Shows context-appropriate message based on filter and search state
-  Widget _buildEmptyState() {
-    String message;
-    String subtitle;
-    IconData icon;
-
-    // Determine appropriate message based on context
-    if (_searchQuery.isNotEmpty) {
-      // Empty state for search with no results
-      message = 'No results found';
-      subtitle = 'Try adjusting your search terms';
-      icon = Icons.search_off;
-    } else {
-      // Empty state based on selected filter
-      switch (_selectedFilterIndex) {
-        case 1: // Upcoming filter
-          message = 'No upcoming activities';
-          subtitle = 'Book a service to see upcoming activities';
-          icon = Icons.schedule;
-          break;
-        case 2: // Completed filter
-          message = 'No completed activities';
-          subtitle = 'Your completed services will appear here';
-          icon = Icons.check_circle_outline;
-          break;
-        case 3: // Cancelled filter
-          message = 'No cancelled activities';
-          subtitle = 'Cancelled services will be shown here';
-          icon = Icons.cancel_outlined;
-          break;
-        default: // All filter
-          message = 'No activities yet';
-          subtitle = 'Start using our services to see your activity history';
-          icon = Icons.history;
-      }
-    }
-
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            icon,
+            Icons.receipt_long_outlined,
             size: 80,
-            color: Colors.grey.shade300,
+            color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
           ),
           const SizedBox(height: 16),
           Text(
-            message,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey,
+            'No Activities Yet',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : const Color(0xFF181411),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            subtitle,
+            'Your service history will appear here',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade500,
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  /// Shows a modal bottom sheet with detailed activity information
-  /// Displays full details and action buttons (cancel/rate)
-  void _showActivityDetails(ActivityItemData activity) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ActivityDetailsSheet(
-        activity: activity,
-        // Provide a callback so the sheet can request cancellation with an optional comment
-        onCancel: (String? comment) {
-          setState(() {
-            final idx = _allActivities.indexWhere((a) => a.id == activity.id);
-            if (idx != -1) {
-              // Update the activity status to cancelled and store the comment
-              _allActivities[idx].status = ActivityStatus.cancelled;
-              _allActivities[idx].comments = comment;
-
-              // Update in ActivityManager as well
-              ActivityManager().updateActivity(activity.id, _allActivities[idx]);
-            }
-          });
-
-          // Show confirmation to the user
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: const Text('Booking cancelled'),
-            duration: const Duration(seconds: 2),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {
-                // Simple undo: set back to upcoming and clear comment
-                setState(() {
-                  final idx = _allActivities.indexWhere((a) => a.id == activity.id);
-                  if (idx != -1) {
-                    _allActivities[idx].status = ActivityStatus.upcoming;
-                    _allActivities[idx].comments = null;
-
-                    // Update in ActivityManager
-                    ActivityManager().updateActivity(activity.id, _allActivities[idx]);
-                  }
-                });
-              },
+  Widget _buildHeader(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF32281E) : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Activity',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: isDark ? Colors.white : const Color(0xFF181411),
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Your service history',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF221910) : const Color(0xFFF8F7F5),
+              borderRadius: BorderRadius.circular(20),
             ),
-          ));
-        },
+            child: Icon(
+              Icons.filter_list,
+              color: isDark ? Colors.white : const Color(0xFF181411),
+              size: 20,
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-/// Widget that displays an enhanced activity item card
-/// Shows service info, status, date, rating, and price
-class EnhancedActivityItem extends StatelessWidget {
-  final ActivityItemData data;
-  final VoidCallback? onTap; // Callback when card is tapped
+  Widget _buildStatsCards(bool isDark) {
+    final totalSpent = ActivityManager().getTotalSpent();
+    final totalServices = ActivityManager().getTotalServices();
 
-  const EnhancedActivityItem({
-    super.key,
-    required this.data,
-    this.onTap,
-  });
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildStatCard(
+            icon: Icons.account_balance_wallet,
+            iconColor: const Color(0xFFF48C25),
+            iconBgColor: const Color(0xFFF48C25).withOpacity(0.1),
+            label: 'TOTAL SPENT',
+            value: '\$${totalSpent.toStringAsFixed(2)}',
+            isDark: isDark,
+          ),
+          const SizedBox(width: 16),
+          _buildStatCard(
+            icon: Icons.history,
+            iconColor: const Color(0xFF2563EB),
+            iconBgColor: const Color(0xFF2563EB).withOpacity(0.1),
+            label: 'SERVICES',
+            value: '$totalServices',
+            isDark: isDark,
+          ),
+        ],
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: onTap,
+  Widget _buildStatCard({
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBgColor,
+    required String label,
+    required String value,
+    required bool isDark,
+  }) {
+    return Container(
+      width: 144,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF32281E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: iconBgColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: iconColor, size: 18),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : const Color(0xFF181411),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityCard(ActivityItemData activity, bool isDark) {
+    return Dismissible(
+      key: Key(activity.id),
+      background: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        alignment: Alignment.centerRight,
+        child: const Icon(Icons.delete, color: Colors.white, size: 32),
+      ),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) => _showDeleteConfirmation(activity, isDark),
+      child: GestureDetector(
+        onTap: () => _showActivityDetails(activity, isDark),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF32281E) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header row with icon, service name, and status badge
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Service icon with background
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF8C00).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      color: _getServiceIconBgColor(activity.serviceName),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      _getServiceIcon(data.serviceName),
-                      color: const Color(0xFFFF8C00),
-                      size: 20,
+                      _getServiceIcon(activity.serviceName),
+                      color: _getServiceIconColor(activity.serviceName),
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  // Service name and provider
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          data.serviceName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          activity.serviceName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF181411),
+                            height: 1.2,
                           ),
                         ),
+                        const SizedBox(height: 4),
                         Text(
-                          data.serviceProvider,
+                          activity.date,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                            color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  // Status badge with colored background
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: data.statusColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      data.statusText,
-                      style: TextStyle(
-                        color: data.statusColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                  _buildStatusBadge(activity.status),
                 ],
               ),
-              const SizedBox(height: 12),
-              // Service description
-              Text(
-                data.description,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 14,
-                ),
+              const SizedBox(height: 16),
+              Container(
+                height: 1,
+                color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100],
               ),
-              const SizedBox(height: 12),
-              // Footer row with date, rating, and price
+              const SizedBox(height: 16),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Date/time icon and text
-                  Icon(
-                    Icons.access_time,
-                    size: 16,
-                    color: Colors.grey.shade500,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    data.date,
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const Spacer(),
-                  // Rating (only shown if available)
-                  if (data.rating != null) ...[
-                    Icon(
-                      Icons.star,
-                      color: Colors.amber.shade600,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      data.rating.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.directions_car,
+                        color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+                        size: 18,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                  // Price in brand color
+                      const SizedBox(width: 8),
+                      Text(
+                        'Toyota Camry',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : const Color(0xFF181411),
+                        ),
+                      ),
+                    ],
+                  ),
                   Text(
-                    data.price,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFFF8C00),
+                    activity.price,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: activity.status == ActivityStatus.cancelled
+                          ? (isDark ? Colors.white : Colors.black).withOpacity(0.4)
+                          : const Color(0xFFF48C25),
+                      decoration: activity.status == ActivityStatus.cancelled
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                 ],
@@ -605,78 +417,286 @@ class EnhancedActivityItem extends StatelessWidget {
     );
   }
 
-  /// Returns appropriate icon based on service name
-  /// Maps service types to Material icons
+  Future<bool?> _showDeleteConfirmation(ActivityItemData activity, bool isDark) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF32281E) : Colors.white,
+        title: Text(
+          'Delete Activity',
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF181411),
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${activity.serviceName}"?',
+          style: TextStyle(
+            color: (isDark ? Colors.white : Colors.black).withOpacity(0.8),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              await ActivityManager().deleteActivity(activity.id);
+              if (context.mounted) {
+                Navigator.pop(context, true);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${activity.serviceName} deleted'),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClearAllDialog(bool isDark) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF32281E) : Colors.white,
+        title: Text(
+          'Clear All Activities',
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF181411),
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete all activities? This action cannot be undone.',
+          style: TextStyle(
+            color: (isDark ? Colors.white : Colors.black).withOpacity(0.8),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              await ActivityManager().clearAllActivities();
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('All activities cleared'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text(
+              'Clear All',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(ActivityStatus status) {
+    Color bgColor;
+    Color textColor;
+    String text;
+
+    switch (status) {
+      case ActivityStatus.completed:
+        bgColor = const Color(0xFFDCFCE7);
+        textColor = const Color(0xFF166534);
+        text = 'COMPLETED';
+        break;
+      case ActivityStatus.cancelled:
+        bgColor = const Color(0xFFFEE2E2);
+        textColor = const Color(0xFF991B1B);
+        text = 'CANCELED';
+        break;
+      case ActivityStatus.upcoming:
+        bgColor = const Color(0xFFDCEEFF);
+        textColor = const Color(0xFF1E40AF);
+        text = 'UPCOMING';
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: textColor,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+
   IconData _getServiceIcon(String serviceName) {
     switch (serviceName.toLowerCase()) {
-      case 'tow service':
-      case 'tow truck':
+      case 'towing service':
+      case 'towing':
         return Icons.local_shipping;
-      case 'battery service':
-      case 'battery jump':
+      case 'oil change':
+        return Icons.water_drop;
+      case 'tire change':
+      case 'flat tire change':
+        return Icons.tire_repair;
+      case 'diagnostics':
+        return Icons.query_stats;
+      case 'jump start':
         return Icons.battery_charging_full;
-      case 'mobile mechanic':
+      case 'ac repair':
+        return Icons.ac_unit;
       case 'mechanic':
         return Icons.build;
-      case 'auto parts':
-        return Icons.settings;
-      case 'oil change':
-        return Icons.opacity;
-      case 'tire service':
-      case 'tire change':
-        return Icons.tire_repair;
-      case 'car wash':
-        return Icons.local_car_wash;
-      case 'ac service':
-        return Icons.ac_unit;
-      case 'brake service':
-        return Icons.speed;
-      case 'engine tune-up':
-        return Icons.tune;
-      case 'windshield repair':
-        return Icons.visibility;
-      case 'transmission service':
-        return Icons.settings_applications;
-      case 'emergency fuel':
-      case 'fuel delivery':
-        return Icons.local_gas_station;
-      case 'jump start':
-        return Icons.flash_on;
-      case 'lockout service':
-        return Icons.lock_open;
-      case 'diagnostic':
-        return Icons.search;
       default:
-        return Icons.car_repair; // Default icon for unknown services
+        return Icons.build;
     }
+  }
+
+  Color _getServiceIconColor(String serviceName) {
+    switch (serviceName.toLowerCase()) {
+      case 'towing service':
+      case 'towing':
+        return const Color(0xFFF48C25);
+      case 'oil change':
+        return const Color(0xFF3B82F6);
+      case 'tire change':
+      case 'flat tire change':
+        return const Color(0xFF6B7280);
+      case 'diagnostics':
+        return const Color(0xFF9333EA);
+      case 'jump start':
+        return const Color(0xFFEAB308);
+      case 'ac repair':
+        return const Color(0xFF00BCD4);
+      case 'mechanic':
+        return const Color(0xFF4CAF50);
+      default:
+        return const Color(0xFF3B82F6);
+    }
+  }
+
+  Color _getServiceIconBgColor(String serviceName) {
+    return _getServiceIconColor(serviceName).withOpacity(0.1);
+  }
+
+  void _showActivityDetails(ActivityItemData activity, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ActivityDetailsSheet(
+        activity: activity,
+        isDark: isDark,
+        onCancel: (String? comment) async {
+          final manager = ActivityManager();
+          final activities = manager.activities;
+          final idx = activities.indexWhere((a) => a.id == activity.id);
+
+          if (idx != -1) {
+            final updatedActivity = ActivityItemData(
+              id: activity.id,
+              serviceName: activity.serviceName,
+              date: activity.date,
+              status: ActivityStatus.cancelled,
+              price: activity.price,
+              rating: activity.rating,
+              description: activity.description,
+              serviceProvider: activity.serviceProvider,
+              comments: comment,
+              location: activity.location,
+              paymentMethod: activity.paymentMethod,
+            );
+            await manager.updateActivity(activity.id, updatedActivity);
+          }
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Booking cancelled'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        },
+        onDelete: () async {
+          await ActivityManager().deleteActivity(activity.id);
+          if (mounted) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${activity.serviceName} deleted'),
+                duration: const Duration(seconds: 2),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 }
 
-/// Modal bottom sheet that displays detailed activity information
-/// Shows all activity details and provides action buttons
 class ActivityDetailsSheet extends StatelessWidget {
   final ActivityItemData activity;
-  final void Function(String? comment)? onCancel; // Callback invoked when user cancels booking
+  final bool isDark;
+  final void Function(String? comment)? onCancel;
+  final VoidCallback? onDelete;
 
-  const ActivityDetailsSheet({super.key, required this.activity, this.onCancel});
+  const ActivityDetailsSheet({
+    super.key,
+    required this.activity,
+    required this.isDark,
+    this.onCancel,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF32281E) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Drag handle at the top
           Container(
             width: 40,
             height: 4,
             margin: const EdgeInsets.only(top: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -685,25 +705,35 @@ class ActivityDetailsSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Service name header
-                Text(
-                  activity.serviceName,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        activity.serviceName,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white : const Color(0xFF181411),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: onDelete,
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      tooltip: 'Delete Activity',
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
-                // Service provider name
                 Text(
                   activity.serviceProvider,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey.shade600,
+                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Activity details in rows
                 _buildDetailRow('ID', activity.id),
                 _buildDetailRow('Description', activity.description),
                 _buildDetailRow('Date & Time', activity.date),
@@ -715,55 +745,69 @@ class ActivityDetailsSheet extends StatelessWidget {
                   _buildDetailRow('Location', activity.location!),
                 if (activity.paymentMethod != null)
                   _buildDetailRow('Payment', activity.paymentMethod!),
-                // Show comments if present
                 _buildDetailRow('Comments', activity.comments ?? '-'),
                 const SizedBox(height: 20),
-                // Action buttons based on activity status
-                // Cancel button for upcoming activities
                 if (activity.status == ActivityStatus.upcoming)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        // Capture navigator and callback before awaiting to avoid using `context` across
-                        // an async gap (fixes `use_build_context_synchronously` lint).
-                        final NavigatorState navigator = Navigator.of(context);
+                        final navigator = Navigator.of(context);
                         final cancelCallback = onCancel;
 
-                        // Ask user for an optional cancellation comment before proceeding
-                        String? comment = await showDialog<String?>(
+                        final comment = await showDialog<String?>(
                           context: context,
                           builder: (dialogContext) {
-                            final TextEditingController commentController = TextEditingController();
+                            final commentController = TextEditingController();
                             return AlertDialog(
-                              title: const Text('Cancel Booking'),
+                              backgroundColor: isDark ? const Color(0xFF32281E) : Colors.white,
+                              title: Text(
+                                'Cancel Booking',
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : const Color(0xFF181411),
+                                ),
+                              ),
                               content: TextField(
                                 controller: commentController,
-                                decoration: const InputDecoration(
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : const Color(0xFF181411),
+                                ),
+                                decoration: InputDecoration(
                                   hintText: 'Optional comment / reason',
+                                  hintStyle: TextStyle(
+                                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+                                  ),
                                 ),
                                 maxLines: 3,
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(dialogContext).pop(null),
-                                  child: const Text('Dismiss'),
+                                  child: Text(
+                                    'Dismiss',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white70 : Colors.black54,
+                                    ),
+                                  ),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.of(dialogContext).pop(commentController.text.trim().isEmpty ? null : commentController.text.trim()),
-                                  child: const Text('Confirm'),
+                                  onPressed: () {
+                                    final text = commentController.text.trim();
+                                    Navigator.of(dialogContext).pop(text.isEmpty ? null : text);
+                                  },
+                                  child: const Text(
+                                    'Confirm',
+                                    style: TextStyle(color: Color(0xFFF48C25)),
+                                  ),
                                 ),
                               ],
                             );
                           },
                         );
 
-                        // Invoke callback to notify parent to update the activity (even if comment is null)
                         if (cancelCallback != null) {
                           cancelCallback(comment);
                         }
-
-                        // Close the bottom sheet after cancellation using captured navigator
                         navigator.pop();
                       },
                       style: ElevatedButton.styleFrom(
@@ -777,26 +821,6 @@ class ActivityDetailsSheet extends StatelessWidget {
                       child: const Text('Cancel Booking'),
                     ),
                   ),
-                // Rate button for completed activities without rating
-                if (activity.status == ActivityStatus.completed && activity.rating == null)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // TODO: Add rating functionality
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF8C00),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text('Rate Service'),
-                    ),
-                  ),
               ],
             ),
           ),
@@ -805,33 +829,30 @@ class ActivityDetailsSheet extends StatelessWidget {
     );
   }
 
-  /// Helper method to build a detail row with label and value
-  /// Used for displaying activity information in a consistent format
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Label with fixed width for alignment
           SizedBox(
             width: 100,
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
                 fontSize: 14,
               ),
             ),
           ),
           const SizedBox(width: 12),
-          // Value that can expand to fill space
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 14,
+                color: isDark ? Colors.white : const Color(0xFF181411),
               ),
             ),
           ),

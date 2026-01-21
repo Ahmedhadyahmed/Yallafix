@@ -31,6 +31,10 @@ dependencies:
   location: ^8.0.1
   latlong2: ^0.9.1
 
+  # State Management & Storage (NEW)
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
